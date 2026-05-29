@@ -1,4 +1,4 @@
-# MYLF (Manage your little fish)
+# Manage your little fish
 
 ## Collaborators
 
