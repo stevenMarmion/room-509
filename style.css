@@ -1,0 +1,21 @@
+body {
+    /* SETUP Background */
+    background-image: url('assets/far.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-color: #122C64;
+    margin: 0;
+    padding: 0;
+
+    /* FIN SETUP Background */
+
+    color: white; 
+    font-family: sans-serif;
+}
+
+.content {
+    text-align: center;
+    padding: 50px;
+}
