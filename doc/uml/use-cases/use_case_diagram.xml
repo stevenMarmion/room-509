@@ -1,0 +1,58 @@
+<mxfile host="app.diagrams.net" agent="Claude" version="24.7.17">
+  <diagram id="usecase-diagram" name="Use Case Diagram">
+    <mxGraphModel dx="1422" dy="820" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1300" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="sys" value="Manage your little fish" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=14;strokeColor=#666666;fillColor=none;" vertex="1" parent="1"><mxGeometry x="360" y="40" width="800" height="1180" as="geometry"/></mxCell>
+        <mxCell id="a_visitor" value="Visitor" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1"><mxGeometry x="60" y="150" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="a_user" value="User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1"><mxGeometry x="60" y="540" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="a_admin" value="Admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1"><mxGeometry x="60" y="930" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="g_user" style="endArrow=block;endFill=0;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_user" target="a_visitor"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="g_admin" style="endArrow=block;endFill=0;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_admin" target="a_user"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="uc_search" value="Search other users" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="440" y="110" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_view_fish" value="View other users&#x27; fish" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="440" y="190" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_view_aqua" value="View public aquariums" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="440" y="270" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_register" value="Register account" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="440" y="360" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_login" value="Log in" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="440" y="440" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_manage_fish" value="Manage own fish (CRUD)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="440" y="530" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_feed" value="Feed fish" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="440" y="610" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_click" value="Click fish to earn coins" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="440" y="690" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_filter" value="Filter fish list" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="440" y="770" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_profile" value="Manage profile settings" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="440" y="850" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_coins" value="View earned coins" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="440" y="930" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_friends" value="Manage friends" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="440" y="1010" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_trade" value="Trade fish with friends" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="440" y="1090" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_shop" value="Access shop" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="760" y="530" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_buy_food" value="Buy fish food" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="760" y="610" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_upgrade" value="Upgrade aquarium" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="760" y="690" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_challenge" value="Play daily challenges" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="760" y="770" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_admin_panel" value="Access admin panel" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="760" y="850" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="uc_manage_users" value="Manage all users&#x27; data" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="760" y="930" width="210" height="46" as="geometry"/></mxCell>
+        <mxCell id="e_v_uc_search" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_visitor" target="uc_search"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_v_uc_view_fish" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_visitor" target="uc_view_fish"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_v_uc_view_aqua" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_visitor" target="uc_view_aqua"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_v_uc_register" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_visitor" target="uc_register"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_v_uc_login" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_visitor" target="uc_login"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_u_uc_manage_fish" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_user" target="uc_manage_fish"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_u_uc_feed" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_user" target="uc_feed"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_u_uc_click" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_user" target="uc_click"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_u_uc_filter" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_user" target="uc_filter"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_u_uc_profile" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_user" target="uc_profile"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_u_uc_coins" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_user" target="uc_coins"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_u_uc_friends" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_user" target="uc_friends"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_u_uc_trade" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_user" target="uc_trade"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_u_uc_shop" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_user" target="uc_shop"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_u_uc_buy_food" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_user" target="uc_buy_food"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_u_uc_upgrade" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_user" target="uc_upgrade"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_u_uc_challenge" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_user" target="uc_challenge"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_a_uc_admin_panel" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_admin" target="uc_admin_panel"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_a_uc_manage_users" style="endArrow=none;html=1;edgeStyle=none;rounded=0;" edge="1" parent="1" source="a_admin" target="uc_manage_users"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="inc_trade" value="&#171;include&#187;" style="endArrow=open;dashed=1;html=1;fontSize=10;" edge="1" parent="1" source="uc_trade" target="uc_friends"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="inc_buy" value="&#171;include&#187;" style="endArrow=open;dashed=1;html=1;fontSize=10;" edge="1" parent="1" source="uc_buy_food" target="uc_shop"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="inc_upg" value="&#171;include&#187;" style="endArrow=open;dashed=1;html=1;fontSize=10;" edge="1" parent="1" source="uc_upgrade" target="uc_shop"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="inc_manageusers" value="&#171;include&#187;" style="endArrow=open;dashed=1;html=1;fontSize=10;" edge="1" parent="1" source="uc_manage_users" target="uc_admin_panel"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
