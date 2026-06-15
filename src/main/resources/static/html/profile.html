@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/profile.css" />
+  <script type="module" src="/js/ui/profile.js"></script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav>
+    <a class="nav-brand" href="/index.html">
+      <svg viewBox="0 0 64 64"><path d="M52 32c0-10-8-18-20-18-4 0-7 1-10 2L8 16l8 16-8 16 14 0c3 1 6 2 10 2 12 0 20-8 20-18zm-20 8a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>
+      My Aquarium
+    </a>
+    <a href="/index.html">Aquarium</a>
+    <a href="#">My Fish</a>
+    <a href="#">Friends</a>
+    <a href="#">Shop</a>
+    <div class="nav-coins">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="#fff"><circle cx="12" cy="12" r="10"/></svg>
+      <span id="coins">1 240</span>
+    </div>
+    <div class="nav-avatar">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- Avatar + pseudo -->
+    <div class="card">
+      <div class="profile-header">
+        <div class="avatar-circle" id="avatar-initials">A</div>
+        <div class="profile-meta">
+          <h2 id="display-pseudo">alice</h2>
+          <div class="role-badge" id="display-role">USER</div>
+          <div class="joined" id="display-joined">Member since June 2026</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="card">
+      <div class="section-title">Stats</div>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <strong id="stat-coins">1 240</strong>
+          <span>Coins</span>
+        </div>
+        <div class="stat-item">
+          <strong id="stat-fish">6</strong>
+          <span>Fish</span>
+        </div>
+        <div class="stat-item">
+          <strong id="stat-friends">3</strong>
+          <span>Friends</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit profile -->
+    <div class="card">
+      <div class="section-title">Edit profile</div>
+      <form id="profile-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="pseudo">Pseudo</label>
+            <input type="text" id="pseudo" value="alice" />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" value="alice@example.com" />
+          </div>
+          <div class="form-group">
+            <label for="password">New password</label>
+            <input type="password" id="password" placeholder="Leave blank to keep current" />
+          </div>
+          <div class="form-group">
+            <label for="password-confirm">Confirm password</label>
+            <input type="password" id="password-confirm" placeholder="Confirm new password" />
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn-ghost" onclick="loadProfile()">Cancel</button>
+          <button type="submit" class="btn-primary">Save changes</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Theme -->
+    <div class="card">
+      <div class="section-title">Theme</div>
+      <div class="theme-row">
+        <div class="theme-label">
+          Dark mode
+          <small>Switch between light and dark interface</small>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="theme-toggle" />
+          <div class="toggle-track"></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Danger zone -->
+    <div class="card">
+      <div class="section-title" style="color:#e74c3c;">Danger zone</div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size:.9rem;color:#1a3a4a;font-weight:500;">Delete account</div>
+          <div style="font-size:.78rem;color:#aaa;">This action is irreversible.</div>
+        </div>
+        <button class="btn-danger">Delete my account</button>
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>

@@ -1,21 +1,131 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
-    /* SETUP Background */
-    background-image: url('assets/far.png');
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-color: #122C64;
-    margin: 0;
-    padding: 0;
-
-    /* FIN SETUP Background */
-
-    color: white; 
-    font-family: sans-serif;
+    font-family: 'Segoe UI', sans-serif;
+    background: #f0f4f8;
+    min-height: 100vh;
 }
 
-.content {
+/* ── Navbar ── */
+nav {
+    background: #0d7377;
+    display: flex;
+    align-items: center;
+    padding: 0 2rem;
+    height: 60px;
+    gap: 2rem;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-right: auto;
+}
+
+.nav-brand svg { width: 28px; height: 28px; fill: #fff; }
+
+nav a {
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+nav a:hover { color: #fff; }
+
+.nav-coins {
+    background: #f5a623;
+    color: #fff;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 0.35rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.95rem;
+}
+
+.nav-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: #1a3a4a;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+}
+.nav-avatar svg { width: 20px; height: 20px; fill: #fff; }
+
+/* ── Main layout ── */
+main {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 1.2rem;
+    max-width: 1200px;
+    margin: 1.5rem auto;
+    padding: 0 1.5rem;
+}
+
+/* ── Aquarium ── */
+.aquarium-container {
+    border: 2.5px solid #0d7377;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    background: #b2e4e8;
+}
+
+.aquarium-bg {
+    width: 100%;
+    height: 420px;
+    object-fit: cover;
+    display: block;
+}
+
+.aquarium-footer {
+    background: #c9a227;
+    color: #fff;
     text-align: center;
-    padding: 50px;
+    padding: 0.6rem;
+    font-style: italic;
+    font-size: 0.9rem;
 }
+
+/* ── Sidebar cards ── */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    transition: box-shadow 0.2s;
+    text-decoration: none;
+    color: inherit;
+}
+.card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+
+.card-icon {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.card-icon svg { width: 22px; height: 22px; fill: #fff; }
+
+.card-icon.teal   { background: #0d7377; }
+.card-icon.teal2  { background: #14a085; }
+.card-icon.yellow { background: #f5a623; }
+.card-icon.dark   { background: #1a3a4a; }
+
+.card-text strong { display: block; font-size: 0.95rem; color: #1a1a2e; }
+.card-text span   { font-size: 0.8rem; color: #888; }

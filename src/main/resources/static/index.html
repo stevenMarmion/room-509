@@ -4,12 +4,73 @@
     <meta charset="UTF-8">
     <title>MYLF</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="js/app.js"></script>
 </head>
 <body>
 
-    <div class="content">
-        
+  <!-- Navbar -->
+  <nav>
+    <div class="nav-brand">
+        <p>Manage your little fish</p>
     </div>
+    <a href="html/aquarium.html">Aquarium</a>
+    <a href="html/my_fish.html">My Fish</a>
+    <a href="html/friends.html">Friends</a>
+    <a href="html/shop.html">Shop</a>
+    <div class="nav-coins">
+        <!-- Mettre icon de coins -->
+      <p id="coins">1 240</p>
+    </div>
+    <div class="nav-avatar">
+        <!-- Mettre icon de l'avatar, on doit le récupérer en Blob dans la BDD -->
+        <a href="html/profile.html">Profile</a>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main>
+
+    <!-- Aquarium -->
+    <div class="aquarium-container">
+      <img class="aquarium-bg" src="/assets/far.png" alt="Aquarium background" />
+      <div class="aquarium-footer">Click a fish to earn coins</div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+      <a class="card" href="html/daily_challenges.html">
+        <div class="card-icon teal">
+          <!-- gamepad icon à mettre -->
+        </div>
+        <div class="card-text">
+          <strong>Daily challenges</strong>
+          <span id="challenges-summary">3 of 4 done · +150 coins</span> 
+        </div>
+      </a>
+
+      <a class="card" href="html/shop.html">
+        <div class="card-icon teal2">
+          <!-- cart icon à mettre -->
+        </div>
+        <div class="card-text">
+          <strong>Shop</strong>
+          <span>Food · upgrades</span>
+        </div>
+      </a>
+
+      <a class="card" href="html/friends.html">
+        <div class="card-icon yellow">
+          <!-- friends icon à mettre -->
+        </div>
+        <div class="card-text">
+          <strong>Friends</strong>
+          <span id="trade-requests">2 trade requests</span>
+        </div>
+      </a>
+
+    </aside>
+  </main>
 
 </body>
 </html>
