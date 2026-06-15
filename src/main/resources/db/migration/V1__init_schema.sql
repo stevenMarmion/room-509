@@ -123,6 +123,16 @@ CREATE TABLE aquarium_upgrade (
     level_bonus      INT          NOT NULL DEFAULT 0
 );
 
+--- ------------------------------------------------------------
+--  config  (key-value store for application settings)
+-- ------------------------------------------------------------
+CREATE TABLE config (
+    id          BIGSERIAL    PRIMARY KEY,
+    key         VARCHAR(100) NOT NULL UNIQUE,
+    value       VARCHAR(255) NOT NULL,
+    description  TEXT
+);
+
 
 -- ============================================================
 --  V2 - Sample data
@@ -182,3 +192,8 @@ INSERT INTO aquarium_upgrade (name, price, capacity_bonus, level_bonus) VALUES
     ('Small Extension',  100, 5, 0),
     ('Level Up Kit',     200, 0, 1),
     ('Deluxe Bundle',    400, 5, 1);
+
+INSERT INTO config (id, key, value, description) VALUES
+    (1, 'secret', 'ThisIsASecretValue', 'A secret value for testing purposes'),
+    (2, 'daily_challenge_reward', '20', 'Default reward for completing a daily challenge'),
+    (3, 'max_aquarium_level', '10', 'Maximum level an aquarium can reach');
