@@ -1,0 +1,1 @@
+console.log('Bonjour, on teste l\'injection dynamique du js dans l\'index.html !');
