@@ -40,3 +40,25 @@ TO DO (indicate diagram designed through md link to ./doc/uml folder)
     - User can click on their fish by visualizing them in the aquarium interface and gain coins each time user clickes on fish he has
     - User can access to its fish page with multiple filter like filtering fish by size, by color, by name, by species, by age, etc.
     - User has a role, it can be user or admin. If user is admin, he can access through profil page to a button which redirect him to a panel admin in order to manage every user datas
+
+## Commands
+
+### BACKEND
+
+Go to backend folder :
+
+```sh
+cd backend/app
+```
+
+And execute :
+
+```sh
+mvn clean install
+```
+
+To launch application, execute :
+
+```sh
+mvn spring-boot:run
+```
