@@ -24,13 +24,15 @@ public class User {
     private String password;
     private String avatar;
 
-    @Enumerated(EnumType.STRING)
-    private Theme theme;
-
     private int coins;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "role_enum")
     private Role role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "theme_enum")
+    private Theme theme;
 
     private LocalDateTime createdAt;
 

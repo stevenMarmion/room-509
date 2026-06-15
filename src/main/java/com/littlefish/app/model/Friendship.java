@@ -19,6 +19,7 @@ public class Friendship {
     private Long id;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "friend_status")
     private FriendStatus status;
 
     private LocalDateTime since;
