@@ -6,6 +6,10 @@
 - PAQUIER Mael
 - MIAUD Jules
 
+## Deadline
+
+Deadline to produce website is 30th June 2026
+
 ## Idea
 
 Manage your little fish is a game web application used to manage little fishs. 
