@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -20,6 +22,7 @@ public class DailyChallenge {
     private LocalDate date;
     private boolean completed;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

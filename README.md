@@ -52,17 +52,232 @@ TO DO (indicate diagram designed through md link to ./doc/uml folder)
 Go to backend folder :
 
 ```sh
-cd backend/app
+cd manage-your-little-fish
 ```
 
 And execute :
 
 ```sh
-mvn clean install
+mvn clean package -DskipTests
 ```
 
-To launch application, execute :
+To launch application, go to parent folder : 
 
 ```sh
-mvn spring-boot:run
+cd ..
+```
+
+And execute :
+
+```sh
+docker compose up --build -d
+```
+
+## Testing applications
+
+### Users -- /api/users
+
+#### GET all users
+```sh
+curl -X GET http://localhost:8080/api/users
+```
+
+#### GET user by ID
+```sh
+curl -X GET http://localhost:8080/api/users/1
+```
+
+#### POST create user
+```sh
+curl -X POST http://localhost:8080/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "pseudo": "nemo",
+    "email": "nemo@ocean.com",
+    "password": "secret",
+    "avatar": "nemo.png",
+    "theme": "DARK",
+    "coins": 100,
+    "role": "USER",
+    "createdAt": "2026-06-15T10:00:00"
+  }'
+```
+
+#### DELETE user by ID
+```sh
+curl -X DELETE http://localhost:8080/api/users/1
+```
+
+### Aquariums — /api/aquariums
+
+#### GET all aquariums
+```sh
+curl -X GET http://localhost:8080/api/aquariums
+```
+
+#### GET aquarium by ID
+```sh
+curl -X GET http://localhost:8080/api/aquariums/1
+```
+
+#### POST create aquarium
+```sh
+curl -X POST http://localhost:8080/api/aquariums \
+  -H "Content-Type: application/json" \
+  -d '{
+    "isPublic": true,
+    "level": 1,
+    "capacity": 10
+  }'
+```
+
+#### DELETE aquarium by ID
+```sh
+curl -X DELETE http://localhost:8080/api/aquariums/1
+```
+
+### Fish — /api/fish
+
+#### GET all fish
+```sh
+curl -X GET http://localhost:8080/api/fish
+```
+
+#### GET fish by ID
+```sh
+curl -X GET http://localhost:8080/api/fish/1
+```
+
+#### POST create fish
+```sh
+curl -X POST http://localhost:8080/api/fish \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Bubbles",
+    "species": "Clownfish",
+    "color": "orange",
+    "size": 5,
+    "age": 2,
+    "lifePoints": 100,
+    "lastFedAt": "2026-06-15T08:00:00"
+  }'
+```
+
+#### DELETE fish by ID
+```sh
+curl -X DELETE http://localhost:8080/api/fish/1
+```
+
+### Trades — /api/trades
+
+#### GET all trades
+```sh
+curl -X GET http://localhost:8080/api/trades
+```
+
+#### GET trade by ID
+```sh
+curl -X GET http://localhost:8080/api/trades/1
+```
+
+#### POST create trade
+```sh
+curl -X POST http://localhost:8080/api/trades \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "PENDING",
+    "createdAt": "2026-06-15T09:00:00",
+    "fish": []
+  }'
+```
+
+#### DELETE trade by ID
+```sh
+curl -X DELETE http://localhost:8080/api/trades/1
+```
+
+### Daily Challenges — /api/challenges
+
+#### GET all challenges
+```sh
+curl -X GET http://localhost:8080/api/challenges
+```
+
+#### GET challenge by ID
+```sh
+curl -X GET http://localhost:8080/api/challenges/1
+```
+
+#### POST create challenge
+```sh
+curl -X POST http://localhost:8080/api/challenges \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Feed 3 fish",
+    "reward": 50,
+    "date": "2026-06-15",
+    "completed": false
+  }'
+```
+
+#### DELETE challenge by ID
+```sh
+curl -X DELETE http://localhost:8080/api/challenges/1
+```
+
+### Shop — Food — /api/shop/food
+
+#### GET all food items
+```sh
+curl -X GET http://localhost:8080/api/shop/food
+```
+
+#### GET food by ID
+```sh
+curl -X GET http://localhost:8080/api/shop/food/1
+```
+
+#### POST create food
+```sh
+curl -X POST http://localhost:8080/api/shop/food \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Premium Pellets",
+    "price": 20,
+    "nutritionValue": 80
+  }'
+```
+
+#### DELETE food by ID
+```sh
+curl -X DELETE http://localhost:8080/api/shop/food/1
+```
+
+### Shop — Upgrades — /api/shop/upgrades
+
+#### GET all upgrades
+```sh
+curl -X GET http://localhost:8080/api/shop/upgrades
+```
+
+#### GET upgrade by ID
+```sh
+curl -X GET http://localhost:8080/api/shop/upgrades/1
+```
+
+#### POST create upgrade
+```sh
+curl -X POST http://localhost:8080/api/shop/upgrades \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Large Tank",
+    "price": 200,
+    "capacityBonus": 5,
+    "levelBonus": 1
+  }'
+```
+
+#### DELETE upgrade by ID
+```sh
+curl -X DELETE http://localhost:8080/api/shop/upgrades/1
 ```

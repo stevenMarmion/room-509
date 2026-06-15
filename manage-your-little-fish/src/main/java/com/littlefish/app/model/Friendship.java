@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -21,10 +23,12 @@ public class Friendship {
 
     private LocalDateTime since;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "requester_id")
     private User requester;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "addressee_id")
     private User addressee;
