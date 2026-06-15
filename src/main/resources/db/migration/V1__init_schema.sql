@@ -16,9 +16,9 @@ CREATE TABLE users (
     email       VARCHAR(100) NOT NULL UNIQUE,
     password    VARCHAR(255) NOT NULL,
     avatar      VARCHAR(255),
-    theme       theme_enum   NOT NULL DEFAULT 'LIGHT',
+    theme       theme_enum   NOT NULL DEFAULT 'LIGHT' CHECK (theme IN ('LIGHT', 'DARK')),
     coins       INT          NOT NULL DEFAULT 0,
-    role        role_enum    NOT NULL DEFAULT 'USER',
+    role        VARCHAR(20)  NOT NULL DEFAULT 'USER' CHECK (role IN ('USER', 'ADMIN')),
     created_at  TIMESTAMP    NOT NULL DEFAULT NOW()
 );
 
@@ -66,7 +66,7 @@ CREATE TABLE friendship (
     id            BIGSERIAL  PRIMARY KEY,
     requester_id  BIGINT     NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     addressee_id  BIGINT     NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    status        friend_status NOT NULL DEFAULT 'PENDING',
+    status        friend_status NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'ACCEPTED', 'BLOCKED')),
     since         TIMESTAMP  NOT NULL DEFAULT NOW(),
     CONSTRAINT uq_friendship UNIQUE (requester_id, addressee_id)
 );
@@ -77,7 +77,7 @@ CREATE TABLE friendship (
 CREATE TABLE trade (
     id           BIGSERIAL    PRIMARY KEY,
     initiator_id BIGINT       NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    status       trade_status NOT NULL DEFAULT 'PENDING',
+    status       trade_status NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'ACCEPTED', 'REJECTED')),
     created_at   TIMESTAMP    NOT NULL DEFAULT NOW()
 );
 

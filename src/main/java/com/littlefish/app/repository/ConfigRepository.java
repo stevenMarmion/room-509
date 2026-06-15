@@ -7,5 +7,5 @@ import java.util.Optional;
 
 @Repository
 public interface ConfigRepository extends JpaRepository<Config, Long> {
-    public Optional<Config> findByKeyConfig(String key);
+    public Optional<Config> findByKey(String key);
 }

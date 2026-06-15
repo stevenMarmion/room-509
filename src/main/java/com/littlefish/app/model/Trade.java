@@ -20,6 +20,7 @@ public class Trade {
     private Long id;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "trade_status")
     private TradeStatus status;
 
     private LocalDateTime createdAt;

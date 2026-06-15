@@ -19,6 +19,6 @@ public class ConfigService {
     }
 
     public Optional<Config> findByKey(String key) {
-        return configRepository.findByKeyConfig(key);
+        return configRepository.findByKey(key);
     }
 }
