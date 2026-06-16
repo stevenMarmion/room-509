@@ -20,10 +20,22 @@ services:
       timeout: 5s
       retries: 5
 
-  # app:
+  # frontend:
   #   build:
-  #     context: .
-  #   container_name: littlefish-app
+  #     context: ./frontend
+  #   container_name: littlefish-frontend
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - fish-net
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+
+  # backend:
+  #   build:
+  #     context: ./backend
+  #   container_name: littlefish-backend
   #   ports:
   #     - "8080:8080"
   #   environment:
