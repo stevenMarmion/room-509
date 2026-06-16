@@ -38,6 +38,7 @@ CREATE TABLE notification_preference (
 -- ------------------------------------------------------------
 CREATE TABLE aquarium (
     id         BIGSERIAL PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL,
     user_id    BIGINT    NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     is_public  BOOLEAN   NOT NULL DEFAULT FALSE,
     level      INT       NOT NULL DEFAULT 1,
@@ -76,7 +77,9 @@ CREATE TABLE friendship (
 -- ------------------------------------------------------------
 CREATE TABLE trade (
     id           BIGSERIAL    PRIMARY KEY,
+    price        INT          NOT NULL DEFAULT 0,
     initiator_id BIGINT       NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    receiver_id  BIGINT       NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     status       trade_status NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'ACCEPTED', 'REJECTED')),
     created_at   TIMESTAMP    NOT NULL DEFAULT NOW()
 );
@@ -151,10 +154,10 @@ INSERT INTO notification_preference (user_id, notify_on_death, notify_before_dea
     (3, FALSE, FALSE, FALSE);
 
 -- Aquariums
-INSERT INTO aquarium (user_id, is_public, level, capacity) VALUES
-    (1, TRUE,  2, 10),
-    (2, FALSE, 1,  5),
-    (3, TRUE,  3, 15);
+INSERT INTO aquarium (user_id, is_public, level, capacity, name) VALUES
+    (1, TRUE,  2, 10, 'Alice''s Aquarium'),
+    (2, FALSE, 1,  5, 'Bob''s Aquarium'),
+    (3, TRUE,  3, 15, 'Admin''s Aquarium');
 
 -- Fish
 INSERT INTO fish (aquarium_id, name, species, color, size, age, life_points, last_fed_at) VALUES
@@ -169,8 +172,9 @@ INSERT INTO friendship (requester_id, addressee_id, status, since) VALUES
     (1, 3, 'PENDING',  NOW());
 
 -- Trades
-INSERT INTO trade (initiator_id, status) VALUES
-    (1, 'PENDING');
+INSERT INTO trade (initiator_id, status, price) VALUES
+    (1, 'PENDING', 100),
+    (2, 'ACCEPTED', 50);
 
 INSERT INTO trade_fish (trade_id, fish_id) VALUES
     (1, 2);

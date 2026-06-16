@@ -32,6 +32,21 @@ public class AquariumController {
         return aquariumService.save(aquarium);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Aquarium> update(@PathVariable Long id, @RequestBody Aquarium patch) {
+        return aquariumService.update(id, patch)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // Endpint to add a new fish to an aquarium
+    @PostMapping("/{id}/fish")
+    public ResponseEntity<Aquarium> addFish(@PathVariable Long id, @RequestBody Aquarium patch) {
+        return aquariumService.addFish(id, patch)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         aquariumService.deleteById(id);

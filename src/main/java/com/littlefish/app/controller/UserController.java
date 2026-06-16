@@ -23,8 +23,22 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<User> getById(@PathVariable Long id) {
         return userService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/pseudo/{pseudo}")
+    public ResponseEntity<User> getByPseudo(@PathVariable String pseudo) {
+        return userService.findByPseudo(pseudo)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/pseudo/{pseudo}/fishes")
+    public ResponseEntity<?> getFishesByPseudo(@PathVariable String pseudo) {
+        return userService.findByPseudo(pseudo)
+            .map(user -> ResponseEntity.ok().body(user.getAquarium().getFish()))
+            .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -35,8 +49,8 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User patch) {
         return userService.update(id, patch)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

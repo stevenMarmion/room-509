@@ -4,6 +4,7 @@ import com.littlefish.app.model.DailyChallenge;
 import com.littlefish.app.repository.DailyChallengeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import java.util.Collections;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,11 +23,13 @@ public class DailyChallengeService {
         return dailyChallengeRepository.findById(id);
     }
 
-    public DailyChallenge save(DailyChallenge dailyChallenge) {
-        return dailyChallengeRepository.save(dailyChallenge);
-    }
-
-    public void deleteById(Long id) {
-        dailyChallengeRepository.deleteById(id);
+    public List<DailyChallenge> findRandom(int count) {
+        List<DailyChallenge> allChallenges = dailyChallengeRepository.findAll();
+        if (allChallenges.size() <= count) {
+            return allChallenges;
+        } else {
+            Collections.shuffle(allChallenges);
+            return allChallenges.subList(0, count);
+        }
     }
 }

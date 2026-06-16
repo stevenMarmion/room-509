@@ -17,6 +17,7 @@ public class Aquarium {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String name;
     private boolean isPublic;
     private int level;
     private int capacity;

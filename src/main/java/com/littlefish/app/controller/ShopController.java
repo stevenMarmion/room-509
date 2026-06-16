@@ -28,17 +28,6 @@ public class ShopController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/food")
-    public Food createFood(@RequestBody Food food) {
-        return shopService.saveFood(food);
-    }
-
-    @DeleteMapping("/food/{id}")
-    public ResponseEntity<Void> deleteFood(@PathVariable Long id) {
-        shopService.deleteFoodById(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("/upgrades")
     public List<AquariumUpgrade> getAllUpgrades() {
         return shopService.findAllUpgrades();
@@ -49,16 +38,5 @@ public class ShopController {
         return shopService.findUpgradeById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping("/upgrades")
-    public AquariumUpgrade createUpgrade(@RequestBody AquariumUpgrade upgrade) {
-        return shopService.saveUpgrade(upgrade);
-    }
-
-    @DeleteMapping("/upgrades/{id}")
-    public ResponseEntity<Void> deleteUpgrade(@PathVariable Long id) {
-        shopService.deleteUpgradeById(id);
-        return ResponseEntity.noContent().build();
     }
 }
