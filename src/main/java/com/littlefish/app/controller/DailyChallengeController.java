@@ -14,11 +14,7 @@ import java.util.List;
 public class DailyChallengeController {
 
     private final DailyChallengeService dailyChallengeService;
-
-    @GetMapping
-    public List<DailyChallenge> getAll() {
-        return dailyChallengeService.findAll();
-    }
+    private static final int RANDOM_CHALLENGE_COUNT = 3;
 
     @GetMapping("/{id}")
     public ResponseEntity<DailyChallenge> getById(@PathVariable Long id) {
@@ -27,14 +23,8 @@ public class DailyChallengeController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public DailyChallenge create(@RequestBody DailyChallenge dailyChallenge) {
-        return dailyChallengeService.save(dailyChallenge);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        dailyChallengeService.deleteById(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping("/random")
+    public ResponseEntity<List<DailyChallenge>> getRandom() {
+        return ResponseEntity.ok().body(dailyChallengeService.findRandom(RANDOM_CHALLENGE_COUNT));
     }
 }

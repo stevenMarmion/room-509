@@ -24,11 +24,17 @@ public class Trade {
     private TradeStatus status;
 
     private LocalDateTime createdAt;
+    private int price;
 
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "initiator_id")
     private User initiator;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
 
     @ManyToMany
     @JoinTable(

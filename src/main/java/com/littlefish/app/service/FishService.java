@@ -21,12 +21,4 @@ public class FishService {
     public Optional<Fish> findById(Long id) {
         return fishRepository.findById(id);
     }
-
-    public Fish save(Fish fish) {
-        return fishRepository.save(fish);
-    }
-
-    public void deleteById(Long id) {
-        fishRepository.deleteById(id);
-    }
 }
