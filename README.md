@@ -19,7 +19,7 @@ Fishs are losing point of life every minutes so you had to often check lifecycle
 ## Technical stack
 
 - Backend could be done in Java 17/21 Spring Boot - mvn
-- Frontend could be done in HTML, CSS, JS with bootstraps
+- Frontend could be done in Vue.JS, JS with bootstraps
 - Docker will be used in order to contnairized applications and use compose technology to organized deployment
 - PostgreSQL will be used as SGBD in order to store app datas
 
@@ -52,7 +52,7 @@ TO DO (indicate diagram designed through md link to ./doc/uml folder)
 Go to backend folder :
 
 ```sh
-cd manage-your-little-fish
+cd backend
 ```
 
 And execute :
@@ -71,6 +71,32 @@ And execute :
 
 ```sh
 docker compose up --build -d
+```
+
+### FRONTEND
+
+### Project Setup
+
+```sh
+npm install
+```
+
+### Compile and Hot-Reload for Development
+
+```sh
+npm run dev
+```
+
+### Compile and Minify for Production
+
+```sh
+npm run build
+```
+
+### Lint with [ESLint](https://eslint.org/)
+
+```sh
+npm run lint
 ```
 
 ## Testing applications
