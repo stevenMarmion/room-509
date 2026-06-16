@@ -2,11 +2,6 @@
 --  V1 - Initial schema
 -- ============================================================
 
-CREATE TYPE role_enum        AS ENUM ('USER', 'ADMIN');
-CREATE TYPE theme_enum       AS ENUM ('LIGHT', 'DARK');
-CREATE TYPE friend_status    AS ENUM ('PENDING', 'ACCEPTED', 'BLOCKED');
-CREATE TYPE trade_status     AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED');
-
 -- ------------------------------------------------------------
 --  users
 -- ------------------------------------------------------------
@@ -16,7 +11,7 @@ CREATE TABLE users (
     email       VARCHAR(100) NOT NULL UNIQUE,
     password    VARCHAR(255) NOT NULL,
     avatar      VARCHAR(255),
-    theme       theme_enum   NOT NULL DEFAULT 'LIGHT' CHECK (theme IN ('LIGHT', 'DARK')),
+    theme       VARCHAR(10)  NOT NULL DEFAULT 'LIGHT' CHECK (theme IN ('LIGHT', 'DARK')),
     coins       INT          NOT NULL DEFAULT 0,
     role        VARCHAR(20)  NOT NULL DEFAULT 'USER' CHECK (role IN ('USER', 'ADMIN')),
     created_at  TIMESTAMP    NOT NULL DEFAULT NOW()
@@ -67,7 +62,7 @@ CREATE TABLE friendship (
     id            BIGSERIAL  PRIMARY KEY,
     requester_id  BIGINT     NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     addressee_id  BIGINT     NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    status        friend_status NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'ACCEPTED', 'BLOCKED')),
+    status        VARCHAR(10) NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'ACCEPTED', 'BLOCKED')),
     since         TIMESTAMP  NOT NULL DEFAULT NOW(),
     CONSTRAINT uq_friendship UNIQUE (requester_id, addressee_id)
 );
@@ -80,7 +75,7 @@ CREATE TABLE trade (
     price        INT          NOT NULL DEFAULT 0,
     initiator_id BIGINT       NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     receiver_id  BIGINT       NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    status       trade_status NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'ACCEPTED', 'REJECTED')),
+    status       VARCHAR(10)  NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'ACCEPTED', 'REJECTED')),
     created_at   TIMESTAMP    NOT NULL DEFAULT NOW()
 );
 
@@ -126,14 +121,14 @@ CREATE TABLE aquarium_upgrade (
     level_bonus      INT          NOT NULL DEFAULT 0
 );
 
---- ------------------------------------------------------------
+-- ------------------------------------------------------------
 --  config  (key-value store for application settings)
 -- ------------------------------------------------------------
 CREATE TABLE config (
     id          BIGSERIAL    PRIMARY KEY,
     key         VARCHAR(100) NOT NULL UNIQUE,
     value       VARCHAR(255) NOT NULL,
-    description  TEXT
+    description TEXT
 );
 
 
@@ -141,63 +136,54 @@ CREATE TABLE config (
 --  V2 - Sample data
 -- ============================================================
 
--- Users (passwords are bcrypt hashes of "password123")
 INSERT INTO users (pseudo, email, password, theme, coins, role) VALUES
-    ('alice',   'alice@example.com',   '$2a$10$7QJ8Z1e2Kp3mN5oP6qR8SuXvYwZaAbBcCdDeEfFgGhHiIjJkKlLm', 'LIGHT', 100, 'USER'),
-    ('bob',     'bob@example.com',     '$2a$10$7QJ8Z1e2Kp3mN5oP6qR8SuXvYwZaAbBcCdDeEfFgGhHiIjJkKlLm', 'DARK',   50, 'USER'),
-    ('admin',   'admin@example.com',   '$2a$10$7QJ8Z1e2Kp3mN5oP6qR8SuXvYwZaAbBcCdDeEfFgGhHiIjJkKlLm', 'LIGHT',  500, 'ADMIN');
+    ('alice', 'alice@example.com', '$2a$10$7QJ8Z1e2Kp3mN5oP6qR8SuXvYwZaAbBcCdDeEfFgGhHiIjJkKlLm', 'LIGHT', 100, 'USER'),
+    ('bob',   'bob@example.com',   '$2a$10$7QJ8Z1e2Kp3mN5oP6qR8SuXvYwZaAbBcCdDeEfFgGhHiIjJkKlLm', 'DARK',   50, 'USER'),
+    ('admin', 'admin@example.com', '$2a$10$7QJ8Z1e2Kp3mN5oP6qR8SuXvYwZaAbBcCdDeEfFgGhHiIjJkKlLm', 'LIGHT', 500, 'ADMIN');
 
--- Notification preferences
 INSERT INTO notification_preference (user_id, notify_on_death, notify_before_death, daily_reminder) VALUES
     (1, TRUE,  TRUE,  TRUE),
     (2, TRUE,  FALSE, FALSE),
     (3, FALSE, FALSE, FALSE);
 
--- Aquariums
 INSERT INTO aquarium (user_id, is_public, level, capacity, name) VALUES
     (1, TRUE,  2, 10, 'Alice''s Aquarium'),
     (2, FALSE, 1,  5, 'Bob''s Aquarium'),
     (3, TRUE,  3, 15, 'Admin''s Aquarium');
 
--- Fish
 INSERT INTO fish (aquarium_id, name, species, color, size, age, life_points, last_fed_at) VALUES
-    (1, 'Nemo',    'Clownfish',  'Orange',  2, 1, 100, NOW()),
-    (1, 'Dory',    'Tang',       'Blue',    3, 2,  80, NOW() - INTERVAL '1 hour'),
-    (2, 'Goldie',  'Goldfish',   'Gold',    1, 0, 100, NOW()),
-    (3, 'Sharky',  'Shark',      'Grey',    5, 3,  60, NOW() - INTERVAL '2 hours');
+    (1, 'Nemo',   'Clownfish', 'Orange', 2, 1, 100, NOW()),
+    (1, 'Dory',   'Tang',      'Blue',   3, 2,  80, NOW() - INTERVAL '1 hour'),
+    (2, 'Goldie', 'Goldfish',  'Gold',   1, 0, 100, NOW()),
+    (3, 'Sharky', 'Shark',     'Grey',   5, 3,  60, NOW() - INTERVAL '2 hours');
 
--- Friendships
 INSERT INTO friendship (requester_id, addressee_id, status, since) VALUES
     (1, 2, 'ACCEPTED', NOW()),
     (1, 3, 'PENDING',  NOW());
 
--- Trades
-INSERT INTO trade (initiator_id, status, price) VALUES
-    (1, 'PENDING', 100),
-    (2, 'ACCEPTED', 50);
+INSERT INTO trade (initiator_id, receiver_id, status, price) VALUES
+    (1, 2, 'PENDING',  100),
+    (2, 1, 'ACCEPTED',  50);
 
 INSERT INTO trade_fish (trade_id, fish_id) VALUES
     (1, 2);
 
--- Daily challenges
 INSERT INTO daily_challenge (user_id, name, reward, date, completed) VALUES
-    (1, 'Feed all fish',      20, CURRENT_DATE, FALSE),
+    (1, 'Feed all fish',           20, CURRENT_DATE, FALSE),
     (1, 'Visit a friend aquarium', 10, CURRENT_DATE, FALSE),
-    (2, 'Feed all fish',      20, CURRENT_DATE, TRUE);
+    (2, 'Feed all fish',           20, CURRENT_DATE, TRUE);
 
--- Shop items — Food
 INSERT INTO food (name, price, nutrition_value) VALUES
-    ('Basic Pellets',   10, 10),
-    ('Premium Flakes',  25, 25),
-    ('Live Brine',      50, 50);
+    ('Basic Pellets',  10, 10),
+    ('Premium Flakes', 25, 25),
+    ('Live Brine',     50, 50);
 
--- Shop items — Aquarium upgrades
 INSERT INTO aquarium_upgrade (name, price, capacity_bonus, level_bonus) VALUES
-    ('Small Extension',  100, 5, 0),
-    ('Level Up Kit',     200, 0, 1),
-    ('Deluxe Bundle',    400, 5, 1);
+    ('Small Extension', 100, 5, 0),
+    ('Level Up Kit',    200, 0, 1),
+    ('Deluxe Bundle',   400, 5, 1);
 
 INSERT INTO config (id, key, value, description) VALUES
-    (1, 'secret', 'ThisIsASecretValue', 'A secret value for testing purposes'),
-    (2, 'daily_challenge_reward', '20', 'Default reward for completing a daily challenge'),
-    (3, 'max_aquarium_level', '10', 'Maximum level an aquarium can reach');
+    (1, 'secret',                 'ThisIsASecretValue', 'A secret value for testing purposes'),
+    (2, 'daily_challenge_reward', '20',                 'Default reward for completing a daily challenge'),
+    (3, 'max_aquarium_level',     '10',                 'Maximum level an aquarium can reach');
