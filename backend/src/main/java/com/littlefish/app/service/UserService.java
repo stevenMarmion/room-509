@@ -1,5 +1,7 @@
 package com.littlefish.app.service;
 
+import com.littlefish.app.dto.FriendshipDTO;
+import com.littlefish.app.model.Friendship;
 import com.littlefish.app.model.User;
 import com.littlefish.app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -58,5 +60,17 @@ public class UserService {
 
     public void deleteById(Long id) {
         userRepository.deleteById(id);
+    }
+
+    public FriendshipDTO toDTO(Friendship f, String requesterPseudo) {
+        User friend = f.getRequester().getPseudo().equals(requesterPseudo) ? f.getAddressee(): f.getRequester();
+
+        return new FriendshipDTO(
+            f.getStatus(),
+            f.getSince(),
+            friend.getPseudo(),
+            f.getSince(),
+            friend.getRole().name()
+        );
     }
 }
