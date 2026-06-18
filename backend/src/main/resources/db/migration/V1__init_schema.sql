@@ -97,7 +97,8 @@ CREATE TABLE daily_challenge (
     name      VARCHAR(100) NOT NULL,
     reward    INT          NOT NULL DEFAULT 0,
     date      DATE         NOT NULL DEFAULT CURRENT_DATE,
-    completed BOOLEAN      NOT NULL DEFAULT FALSE
+    completed BOOLEAN      NOT NULL DEFAULT FALSE,
+    description TEXT       NOT NULL
 );
 
 -- ------------------------------------------------------------
@@ -168,10 +169,11 @@ INSERT INTO trade (initiator_id, receiver_id, status, price) VALUES
 INSERT INTO trade_fish (trade_id, fish_id) VALUES
     (1, 2);
 
-INSERT INTO daily_challenge (user_id, name, reward, date, completed) VALUES
-    (1, 'Feed all fish',           20, CURRENT_DATE, FALSE),
-    (1, 'Visit a friend aquarium', 10, CURRENT_DATE, FALSE),
-    (2, 'Feed all fish',           20, CURRENT_DATE, TRUE);
+INSERT INTO daily_challenge (user_id, name, reward, date, completed, description) VALUES
+    (1, 'Feed all fish',           20, CURRENT_DATE, FALSE, 'Feed all the fish in your aquarium'),
+    (1, 'Visit a friend aquarium', 10, CURRENT_DATE, FALSE, 'Visit a friend''s aquarium'),
+    (2, 'Feed all fish',           20, CURRENT_DATE, TRUE, 'Feed all the fish in your aquarium'),
+    (3, 'Level up your aquarium',  30, CURRENT_DATE, FALSE, 'Upgrade your aquarium to the next level');
 
 INSERT INTO food (name, price, nutrition_value) VALUES
     ('Basic Pellets',  10, 10),
