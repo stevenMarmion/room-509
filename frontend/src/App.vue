@@ -1,12 +1,14 @@
 <template>
   <NavBar :coins="userCoins" />
   <RouterView />
+  <AppFooter />
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { RouterView } from 'vue-router'
 import NavBar from '@/components/NavBar.vue'
+import AppFooter from '@/components/AppFooter.vue'
 import { get_api } from '@/services/api.js'
 
 const userCoins = ref(0)
