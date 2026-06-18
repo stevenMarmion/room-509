@@ -49,6 +49,7 @@
         <!-- Content -->
         <div class="challenge-content">
           <strong class="challenge-name">{{ challenge.name }}</strong>
+          <span class="challenge-description">{{ challenge.description }}</span>
           <span class="challenge-date">{{ formatDate(challenge.date) }}</span>
         </div>
 
@@ -238,6 +239,11 @@ onMounted(loadChallenges)
 .challenge-date {
   font-size: 0.78rem;
   color: #aaa;
+}
+.challenge-description {
+  font-size: 0.82rem;
+  color: #555;
+  margin-top: 0.2rem;
 }
 
 /* Reward badge */

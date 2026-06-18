@@ -21,6 +21,7 @@ public class DailyChallenge {
     private int reward;
     private LocalDate date;
     private boolean completed;
+    private String description;
 
     @JsonIgnore
     @ManyToOne
