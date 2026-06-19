@@ -2,7 +2,6 @@ package com.littlefish.app.controller;
 
 import com.littlefish.app.dto.LoginRequest;
 import com.littlefish.app.dto.RegisterRequest;
-import com.littlefish.app.model.Aquarium;
 import com.littlefish.app.model.User;
 import com.littlefish.app.service.JwtService;
 import com.littlefish.app.service.UserService;
