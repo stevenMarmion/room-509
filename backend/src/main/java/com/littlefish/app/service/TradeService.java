@@ -52,15 +52,15 @@ public class TradeService {
     public Optional<Trade> acceptTrade(Long id) {
         Trade existingTrade = tradeRepository.findById(id).orElse(null);
         if (existingTrade != null) {
-            userService.findById(existingTrade.getInitiator().getId()).ifPresent(user -> {
+            userService.findByPseudo(existingTrade.getInitiator().getPseudo()).ifPresent(user -> {
                 user.setCoins(user.getCoins() + existingTrade.getPrice());
                 user.getAquarium().getFish().removeAll(existingTrade.getFish());
-                userService.save(user);
+                userService.update(user.getPseudo(), user);
             });
-            userService.findById(existingTrade.getReceiver().getId()).ifPresent(user -> {
+            userService.findByPseudo(existingTrade.getReceiver().getPseudo()).ifPresent(user -> {
                 user.setCoins(user.getCoins() - existingTrade.getPrice());
                 user.getAquarium().getFish().addAll(existingTrade.getFish());
-                userService.save(user);
+                userService.update(user.getPseudo(), user);
             });
             existingTrade.setStatus(TradeStatus.ACCEPTED);
             return Optional.of(tradeRepository.save(existingTrade));

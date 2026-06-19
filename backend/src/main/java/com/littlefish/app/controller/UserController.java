@@ -21,28 +21,21 @@ public class UserController {
         return userService.findAll();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getById(@PathVariable Long id) {
-        return userService.findById(id)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/pseudo/{pseudo}")
+    @GetMapping("/{pseudo}")
     public ResponseEntity<User> getByPseudo(@PathVariable String pseudo) {
         return userService.findByPseudo(pseudo)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/pseudo/{pseudo}/fishes")
+    @GetMapping("/{pseudo}/fishes")
     public ResponseEntity<?> getFishesByPseudo(@PathVariable String pseudo) {
         return userService.findByPseudo(pseudo)
             .map(user -> ResponseEntity.ok().body(user.getAquarium().getFish()))
             .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/pseudo/{pseudo}/friends")
+    @GetMapping("/{pseudo}/friends")
     public ResponseEntity<?> getFriendsByPseudo(@PathVariable String pseudo) {
         return userService.findByPseudo(pseudo)
             .map(user -> {
@@ -55,21 +48,16 @@ public class UserController {
             .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public User create(@RequestBody User user) {
-        return userService.save(user);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User patch) {
-        return userService.update(id, patch)
+    @PutMapping("/{pseudo}")
+    public ResponseEntity<User> update(@PathVariable String pseudo, @RequestBody User patch) {
+        return userService.update(pseudo, patch)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        userService.deleteById(id);
+    @DeleteMapping("/{pseudo}")
+    public ResponseEntity<Void> delete(@PathVariable String pseudo) {
+        userService.deleteByPseudo(pseudo);
         return ResponseEntity.noContent().build();
     }
 }

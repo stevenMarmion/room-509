@@ -86,6 +86,9 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { get_api } from '@/services/api.js'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
@@ -138,7 +141,7 @@ async function loadFriends() {
   error.value   = null
   try {
     // Replace 'alice' with the actual logged-in user pseudo from your Pinia store
-    friends.value = await get_api('/api/users/pseudo/alice/friends')
+    friends.value = await get_api(`/api/users/${authStore.pseudo}/friends`)
   } catch {
     error.value = 'Could not load your friends. Please try again.'
   } finally {

@@ -53,22 +53,22 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
-import { get_api } from '@/services/api.js'
+// import { get_api } from '@/services/api.js'
 
 const challengesSummary = ref('Loading...')
 const tradeRequests     = ref('Loading...')
 
 onMounted(async () => {
-  try {
-    const config = await get_api('/api/config')
-    console.log('Config loaded:', config)
-  } catch (e) {
-    console.warn('Could not load config:', e)
-  }
+  // try {
+  //   const config = await get_api('/api/config')
+  //   console.log('Config loaded:', config)
+  // } catch (e) {
+  //   console.warn('Could not load config:', e)
+  // }
 
   // Replace with real API calls when endpoints are ready
-  challengesSummary.value = '3 of 4 done · +150 coins'
-  tradeRequests.value     = '2 trade requests'
+  challengesSummary.value = 'To complete with real datas'
+  tradeRequests.value     = 'To complete with real datas'
 })
 </script>
 

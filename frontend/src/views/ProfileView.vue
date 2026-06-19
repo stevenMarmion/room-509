@@ -90,6 +90,18 @@
       </div>
     </div>
 
+    <!-- ── Logout ── -->
+    <div class="pcard">
+      <div class="section-title">Session</div>
+      <div class="danger-row">
+        <div>
+          <div class="danger-label">Log out</div>
+          <div class="danger-hint">You'll need to log in again to access your account.</div>
+        </div>
+        <button class="btn-ghost" @click="handleLogout">Log out</button>
+      </div>
+    </div>
+
   </main>
 
   <!-- ── Password modal ── -->
@@ -121,6 +133,11 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { get_api, put_api } from '@/services/api.js'
+import { useAuthStore } from '@/stores/auth.js'
+import { useRouter } from 'vue-router'
+
+const authStore = useAuthStore()
+const router = useRouter()
 
 // ── User state ────────────────────────────────────────────────────────────────
 
@@ -174,7 +191,7 @@ function showToast(message, type = 'success') {
 async function loadProfile() {
   try {
     // Replace 1 with the actual logged-in user id
-    const data = await get_api('/api/users/1')
+    const data = await get_api(`/api/users/${authStore.pseudo}`)
     Object.assign(user, data)
     resetForm()
     isDark.value = data.theme === 'DARK'
@@ -187,8 +204,9 @@ async function loadProfile() {
 
 async function saveProfile() {
   try {
-    await put_api('/api/users/1', { pseudo: form.pseudo, email: form.email })
+    await put_api(`/api/users/${authStore.pseudo}`, { pseudo: form.pseudo, email: form.email })
     showToast('Profile updated successfully.', 'success')
+    authStore.pseudo = form.pseudo
     await loadProfile()
   } catch {
     showToast('Could not update profile. Please try again.', 'error')
@@ -199,7 +217,7 @@ async function saveProfile() {
 
 async function saveTheme() {
   try {
-    await put_api('/api/users/1', { theme: isDark.value ? 'DARK' : 'LIGHT' })
+    await put_api(`/api/users/${authStore.pseudo}`, { theme: isDark.value ? 'DARK' : 'LIGHT' })
   } catch {
     console.warn('Could not update theme.')
   }
@@ -230,11 +248,22 @@ async function savePassword() {
     return
   }
   try {
-    await put_api('/api/users/1', { password: passwordForm.password })
+    await put_api(`/api/users/${authStore.pseudo}`, { password: passwordForm.password })
     showToast('Password updated successfully.', 'success')
     closePasswordModal()
   } catch {
     showToast('Could not update password. Please try again.', 'error')
+  }
+}
+
+// ── Logout ────────────────────────────────────────────────────────────────────
+
+async function handleLogout() {
+  try {
+    await authStore.logout()
+    router.push('/login')
+  } catch {
+    showToast('Could not log out. Please try again.', 'error')
   }
 }
 
