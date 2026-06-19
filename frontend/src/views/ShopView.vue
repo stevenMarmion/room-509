@@ -202,6 +202,9 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { h } from 'vue'
 import { get_api, post_api } from '@/services/api.js'
+import { useAuthStore } from '@/stores/auth.js'
+
+const authStore = useAuthStore()
 
 // ── Sort icon ─────────────────────────────────────────────────────────────────
 
@@ -298,8 +301,7 @@ function showToast(message, type = 'success') {
 
 async function buy(type, item) {
   try {
-    // Replace 1 with the actual logged-in user id from your Pinia store
-    await post_api(`/api/shop/${type === 'food' ? 'food' : 'upgrades'}/${item.id}/buy`, { userId: 1 })
+    await post_api(`/api/shop/${type === 'food' ? 'food' : 'upgrades'}/${item.id}/buy`, { userId: authStore.pseudo })
     userCoins.value -= item.price
     showToast(`${item.name} purchased successfully!`, 'success')
   } catch {
@@ -335,8 +337,7 @@ async function loadUpgrades() {
 
 async function loadUserCoins() {
   try {
-    // Replace 1 with the actual logged-in user id from your Pinia store
-    const user = await get_api('/api/users/1')
+    const user = await get_api(`/api/users/${authStore.pseudo}`)
     userCoins.value = user.coins
   } catch {
     console.warn('Could not load user coins.')

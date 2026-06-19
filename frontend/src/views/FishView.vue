@@ -109,6 +109,9 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { get_api } from '@/services/api.js'
+import { useAuthStore } from '@/stores/auth.js'
+
+const authStore = useAuthStore()
 
 // ── Sort icon sub-component ───────────────────────────────────────────────────
 
@@ -216,9 +219,7 @@ async function loadFishes() {
   error.value   = null
   try {
     // Replace 'alice' with the actual logged-in user pseudo
-    fishes.value = await get_api('/api/users/pseudo/alice/fishes')
-    // const userStore = useUserStore()
-    // fishes.value = await get_api(`/api/users/${userStore.pseudo}/fishes`)
+    fishes.value = await get_api(`/api/users/${authStore.pseudo}/fishes`)
   } catch {
     error.value = 'Could not load your fish. Please try again.'
   } finally {

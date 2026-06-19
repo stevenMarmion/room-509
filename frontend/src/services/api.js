@@ -1,7 +1,9 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 async function get_api(url) {
-    const response = await fetch(`${API_BASE_URL}${url}`);
+    const response = await fetch(`${API_BASE_URL}${url}`, {
+        credentials: 'include',
+    });
     if (!response.ok) {
         throw new Error(`GET ${url} failed: ${response.status}`);
     }
@@ -10,12 +12,16 @@ async function get_api(url) {
 
 async function post_api(url, body) {
     const response = await fetch(`${API_BASE_URL}${url}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(body),
     });
     if (!response.ok) {
         throw new Error(`POST ${url} failed: ${response.status}`);
+    }
+    if (response.status === 204) {
+        return null;
     }
     return response.json();
 }
