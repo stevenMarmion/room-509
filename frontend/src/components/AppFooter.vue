@@ -33,7 +33,7 @@ const currentYear = new Date().getFullYear()
 
 <style scoped>
 .footer {
-  margin-top: 400px;
+  margin-top: 300px;
   background: #0d7377;
   color: rgba(255, 255, 255, 0.75);
 }
@@ -55,7 +55,6 @@ const currentYear = new Date().getFullYear()
   align-items: center;
   gap: 0.5rem;
   font-weight: 700;
-  font-size: 0.95rem;
   color: #fff;
 }
 .footer-logo { font-size: 1.2rem; }
@@ -79,7 +78,6 @@ const currentYear = new Date().getFullYear()
 
 /* ── Legal ── */
 .footer-legal {
-  font-size: 0.78rem;
   color: rgba(255, 255, 255, 0.5);
 }
 
