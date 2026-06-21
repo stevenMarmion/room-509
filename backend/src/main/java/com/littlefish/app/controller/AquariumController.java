@@ -39,7 +39,13 @@ public class AquariumController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Endpint to add a new fish to an aquarium
+    @PutMapping("/{id}/visibility")
+    public ResponseEntity<Aquarium> updateVisibility(@PathVariable Long id, @RequestBody boolean isPublic) {
+        return aquariumService.switchVisibility(id, isPublic)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PostMapping("/{id}/fish")
     public ResponseEntity<Aquarium> addFish(@PathVariable Long id, @RequestBody Aquarium patch) {
         return aquariumService.addFish(id, patch)

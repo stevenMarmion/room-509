@@ -54,12 +54,8 @@
         <!-- Right side: auth-dependent -->
         <div class="d-flex align-items-center gap-3">
 
-          <!-- Logged in: coins + avatar -->
+          <!-- Logged in: avatar -->
           <template v-if="authStore.isAuthenticated">
-            <span class="coins-badge">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="#fff"><circle cx="12" cy="12" r="10"/></svg>
-              {{ formattedCoins }}
-            </span>
             <RouterLink to="/profile" class="avatar-btn" aria-label="Profile">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="#fff">
                 <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
@@ -87,19 +83,6 @@ import { useAuthStore } from '@/stores/auth.js'
 
 const router = useRouter()
 const authStore = useAuthStore()
-
-// Props
-const props = defineProps({
-  coins: {
-    type: Number,
-    default: 0
-  }
-})
-
-// Format coins with a space as thousands separator (e.g. 1 240)
-const formattedCoins = computed(() =>
-  props.coins.toLocaleString('fr-FR')
-)
 
 // ── Search ────────────────────────────────────────────────────────────────────
 

@@ -30,6 +30,7 @@ async function put_api(url, body) {
     const response = await fetch(`${API_BASE_URL}${url}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify(body),
     });
     if (!response.ok) {
