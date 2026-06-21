@@ -5,6 +5,7 @@ import com.littlefish.app.model.Aquarium;
 import com.littlefish.app.model.Friendship;
 import com.littlefish.app.model.NotificationPreference;
 import com.littlefish.app.model.User;
+import com.littlefish.app.model.enums.FriendStatus;
 import com.littlefish.app.model.enums.Role;
 import com.littlefish.app.model.enums.Theme;
 import com.littlefish.app.repository.UserRepository;
@@ -98,6 +99,72 @@ public class UserService {
             existingUser.setCoins(patch.getCoins());
         }
         return Optional.of(userRepository.save(existingUser));
+    }
+
+    public Optional<User> addFriend(String pseudo, String friendPseudo) {
+        User user = userRepository.findByPseudo(pseudo).orElse(null);
+        User friend = userRepository.findByPseudo(friendPseudo).orElse(null);
+
+        if (user == null || friend == null) {
+            return Optional.empty();
+        }
+
+        Friendship friendship = new Friendship();
+        friendship.setRequester(user);
+        friendship.setAddressee(friend);
+        friendship.setStatus(FriendStatus.PENDING);
+        friendship.setSince(LocalDateTime.now());
+
+        user.getFriendships().add(friendship);
+        userRepository.save(user);
+
+        return Optional.of(user);
+    }
+
+    public Optional<User> acceptFriend(String pseudo, String friendPseudo) {
+        User user = userRepository.findByPseudo(pseudo).orElse(null);
+        User friend = userRepository.findByPseudo(friendPseudo).orElse(null);
+
+        if (user == null || friend == null) {
+            return Optional.empty();
+        }
+
+        Friendship friendship = user.getFriendships().stream()
+            .filter(f -> f.getRequester().equals(friend) && f.getAddressee().equals(user))
+            .findFirst()
+            .orElse(null);
+
+        if (friendship == null) {
+            return Optional.empty();
+        }
+
+        friendship.setStatus(FriendStatus.ACCEPTED);
+        userRepository.save(user);
+
+        return Optional.of(user);
+    }
+
+    public Optional<User> rejectFriend(String pseudo, String friendPseudo) {
+        User user = userRepository.findByPseudo(pseudo).orElse(null);
+        User friend = userRepository.findByPseudo(friendPseudo).orElse(null);
+
+        if (user == null || friend == null) {
+            return Optional.empty();
+        }
+
+        Friendship friendship = user.getFriendships().stream()
+            .filter(f -> f.getRequester().equals(friend) && f.getAddressee().equals(user))
+            .findFirst()
+            .orElse(null);
+
+        if (friendship == null) {
+            return Optional.empty();
+        }
+
+        friendship.setStatus(FriendStatus.BLOCKED);
+        userRepository.save(user);
+
+        return Optional.of(user);
     }
 
     public void deleteByPseudo(String pseudo) {

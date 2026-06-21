@@ -37,7 +37,14 @@ public class AquariumService {
         if (patch.getCapacity() != 0) {
             existingAquarium.setCapacity(existingAquarium.getCapacity() + patch.getCapacity());
         }
+        if (patch.isPublic() != existingAquarium.isPublic()) {
+            existingAquarium.setPublic(patch.isPublic());
+        }
         return Optional.of(aquariumRepository.save(existingAquarium));
+    }
+
+    public Optional<Aquarium> switchVisibility(Long id, boolean isPublic) {
+        return update(id, new Aquarium() {{ setPublic(isPublic); }});
     }
 
     public Optional<Aquarium> addFish(Long id, Aquarium patch) {

@@ -48,6 +48,27 @@ public class UserController {
             .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/{pseudo}/add-friend")
+    public ResponseEntity<?> addFriend(@PathVariable String pseudo, @RequestParam String friendPseudo) {
+        return userService.addFriend(pseudo, friendPseudo)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{pseudo}/accept-friend")
+    public ResponseEntity<?> acceptFriend(@PathVariable String pseudo, @RequestParam String friendPseudo) {
+        return userService.acceptFriend(pseudo, friendPseudo)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{pseudo}/reject-friend")
+    public ResponseEntity<?> rejectFriend(@PathVariable String pseudo, @RequestParam String friendPseudo) {
+        return userService.rejectFriend(pseudo, friendPseudo)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+
     @PutMapping("/{pseudo}")
     public ResponseEntity<User> update(@PathVariable String pseudo, @RequestBody User patch) {
         return userService.update(pseudo, patch)
