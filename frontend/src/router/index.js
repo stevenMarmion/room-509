@@ -11,6 +11,7 @@ import RegisterView from '../views/RegisterView.vue'
 import SearchResultsView from '@/views/SearchResultsView.vue'
 import UserProfileView   from '@/views/UserProfileView.vue'
 import AquariumView from '@/views/AquariumView.vue'
+import TradeView from '@/views/TradeView.vue'
 
 
 const router = createRouter({
@@ -25,6 +26,7 @@ const router = createRouter({
     { path: '/friends',           component: FriendsView,          meta: { requiresAuth: true } },
     { path: '/shop',              component: ShopView,             meta: { requiresAuth: true } },
     { path: '/daily-challenges',  component: DailyChallengesView,  meta: { requiresAuth: true } },
+    { path: '/trade',             component: TradeView,            meta: { requiresAuth: true } },
     { path: '/search',            component: SearchResultsView },
     { path: '/users/:pseudo',     component: UserProfileView },
   ],

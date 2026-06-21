@@ -35,6 +35,12 @@
           <li class="nav-item">
             <RouterLink class="nav-link" to="/shop">Shop</RouterLink>
           </li>
+          <li class="nav-item">
+            <RouterLink class="nav-link" to="/daily-challenges">Challenges</RouterLink>
+          </li>
+          <li class="nav-item">
+            <RouterLink class="nav-link" to="/trade">Trade</RouterLink>
+          </li>
         </ul>
 
         <!-- Search bar -->

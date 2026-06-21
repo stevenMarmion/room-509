@@ -1,5 +1,6 @@
 package com.littlefish.app.controller;
 
+import com.littlefish.app.dto.TradeDTO;
 import com.littlefish.app.model.Trade;
 import com.littlefish.app.service.TradeService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,11 @@ public class TradeController {
         return tradeService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/user/{pseudo}")
+    public ResponseEntity<List<TradeDTO>> getByPseudo(@PathVariable String pseudo) {
+        return ResponseEntity.ok(tradeService.findByPseudo(pseudo));
     }
 
     @PostMapping

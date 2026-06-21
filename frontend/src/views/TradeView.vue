@@ -1,5 +1,5 @@
 <template>
-  <main class="friends-layout">
+  <main class="trades-layout">
 
     <!-- ── Toast ── -->
     <Transition name="toast">
@@ -11,27 +11,8 @@
     <!-- ── Header ── -->
     <div class="page-header">
       <div>
-        <h1>Friends</h1>
-        <p class="page-subtitle">{{ filteredFriends.length }} friend{{ filteredFriends.length !== 1 ? 's' : '' }} found</p>
-      </div>
-    </div>
-
-    <!-- ── Pending requests ── -->
-    <div v-if="pendingRequests.length > 0" class="pending-card">
-      <div class="pending-header">
-        <span class="section-title">Friend requests</span>
-        <span class="pending-count">{{ pendingRequests.length }}</span>
-      </div>
-      <div class="pending-list">
-        <button
-          v-for="req in pendingRequests"
-          :key="req.id"
-          class="pending-chip"
-          @click="openRequestPopup(req)"
-        >
-          <span class="pending-avatar">{{ req.pseudo.charAt(0).toUpperCase() }}</span>
-          <span class="pending-pseudo">{{ req.pseudo }}</span>
-        </button>
+        <h1>Trades</h1>
+        <p class="page-subtitle">{{ filteredTrades.length }} trade{{ filteredTrades.length !== 1 ? 's' : '' }} found</p>
       </div>
     </div>
 
@@ -39,27 +20,32 @@
     <div class="filters-card">
 
       <div class="filter-group">
-        <label>Pseudo</label>
-        <input type="text" v-model="filters.pseudo" placeholder="Search by pseudo..." />
+        <label>Friend</label>
+        <input type="text" v-model="filters.friend" placeholder="Search by pseudo..." />
       </div>
 
       <div class="filter-group">
         <label>Status</label>
         <select v-model="filters.status">
           <option value="">All</option>
-          <option value="ACCEPTED">Accepted</option>
           <option value="PENDING">Pending</option>
-          <option value="BLOCKED">Blocked</option>
+          <option value="ACCEPTED">Accepted</option>
+          <option value="REJECTED">Rejected</option>
         </select>
       </div>
 
       <div class="filter-group">
-        <label>Role</label>
-        <select v-model="filters.role">
+        <label>Direction</label>
+        <select v-model="filters.direction">
           <option value="">All</option>
-          <option value="USER">User</option>
-          <option value="ADMIN">Admin</option>
+          <option value="SENT">Sent by me</option>
+          <option value="RECEIVED">Received by me</option>
         </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Max. price</label>
+        <input type="number" v-model.number="filters.maxPrice" placeholder="Any" min="0" />
       </div>
 
       <div class="filter-group filter-group--reset">
@@ -71,74 +57,101 @@
     <!-- ── Loading ── -->
     <div v-if="loading" class="state-box">
       <div class="spinner"></div>
-      <p>Loading your friends...</p>
+      <p>Loading trades...</p>
     </div>
 
     <!-- ── Error ── -->
     <div v-else-if="error" class="state-box state-box--error">
       <p>{{ error }}</p>
-      <button class="btn-ghost" @click="loadFriends">Try again</button>
+      <button class="btn-ghost" @click="loadTrades">Try again</button>
     </div>
 
     <!-- ── Empty ── -->
-    <div v-else-if="filteredFriends.length === 0" class="state-box">
-      <p>No friends match your filters.</p>
+    <div v-else-if="filteredTrades.length === 0" class="state-box">
+      <p>No trades match your filters.</p>
     </div>
 
-    <!-- ── Grid ── -->
-    <div v-else class="friends-grid">
-      <div v-for="f in filteredFriends" :key="f.id" class="friend-card">
+    <!-- ── Trades list ── -->
+    <div v-else class="trades-list">
+      <button
+        v-for="trade in filteredTrades"
+        :key="trade.id"
+        class="trade-card"
+        @click="openTradePopup(trade)"
+      >
+        <div class="trade-avatar">{{ otherParty(trade).charAt(0).toUpperCase() }}</div>
 
-        <!-- Avatar -->
-        <div class="friend-avatar">{{ f.pseudo.charAt(0).toUpperCase() }}</div>
-
-        <!-- Info -->
-        <div class="friend-info">
-          <strong class="friend-pseudo">{{ f.pseudo }}</strong>
-          <span class="friend-since">Friend since {{ formatDate(f.since) }}</span>
+        <div class="trade-info">
+          <strong class="trade-pseudo">
+            {{ direction(trade) === 'SENT' ? 'To' : 'From' }} {{ otherParty(trade) }}
+          </strong>
+          <span class="trade-fish-names">{{ fishNames(trade) }}</span>
         </div>
 
-        <!-- Badges -->
-        <div class="friend-badges">
-          <span class="badge badge--role">{{ f.role }}</span>
-          <span class="badge" :class="statusClass(f.status)">{{ f.status }}</span>
+        <div class="trade-meta">
+          <span class="trade-price">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+            {{ trade.price }}
+          </span>
+          <span class="badge" :class="statusClass(trade.status)">{{ trade.status }}</span>
         </div>
-      </div>
+      </button>
     </div>
 
   </main>
 
-  <!-- ── Friend request popup ── -->
+  <!-- ── Trade detail popup ── -->
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="selectedRequest" class="modal-backdrop" @click.self="closeRequestPopup">
-        <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="request-modal-title">
+      <div v-if="selectedTrade" class="modal-backdrop" @click.self="closeTradePopup">
+        <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="trade-modal-title">
 
-          <button class="modal-close" @click="closeRequestPopup" aria-label="Close">✕</button>
+          <button class="modal-close" @click="closeTradePopup" aria-label="Close">✕</button>
 
-          <h3 id="request-modal-title">Friend request</h3>
+          <h3 id="trade-modal-title">Trade details</h3>
 
-          <button class="request-profile" @click="goToProfile(selectedRequest.pseudo)">
-            <span class="request-avatar">{{ selectedRequest.pseudo.charAt(0).toUpperCase() }}</span>
-            <div class="request-info">
-              <strong>{{ selectedRequest.pseudo }}</strong>
-              <span class="badge badge--role">{{ selectedRequest.role }}</span>
+          <div class="trade-detail-header">
+            <div class="trade-avatar trade-avatar--lg">{{ otherParty(selectedTrade).charAt(0).toUpperCase() }}</div>
+            <div>
+              <strong>{{ otherParty(selectedTrade) }}</strong>
+              <span class="trade-direction">
+                {{ direction(selectedTrade) === 'SENT' ? 'You proposed this trade' : 'They proposed this trade' }}
+              </span>
             </div>
-            <svg class="request-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </button>
+          </div>
 
-          <p class="request-hint">Sent {{ formatDate(selectedRequest.since) }} · Click their name to view their profile</p>
+          <div class="trade-detail-rows">
+            <div class="detail-row">
+              <span>Fish</span>
+              <strong>{{ fishNames(selectedTrade) }}</strong>
+            </div>
+            <div class="detail-row">
+              <span>Price</span>
+              <strong class="price-highlight">{{ selectedTrade.price }} coins</strong>
+            </div>
+            <div class="detail-row">
+              <span>Date</span>
+              <strong>{{ formatDate(selectedTrade.createdAt) }}</strong>
+            </div>
+            <div class="detail-row">
+              <span>Status</span>
+              <span class="badge" :class="statusClass(selectedTrade.status)">{{ selectedTrade.status }}</span>
+            </div>
+          </div>
 
-          <div class="btn-row">
-            <button class="btn-ghost" :disabled="responding" @click="respondToRequest('reject')">
-              Decline
+          <!-- Actions only for pending trades received by me -->
+          <div v-if="selectedTrade.status === 'PENDING' && direction(selectedTrade) === 'RECEIVED'" class="btn-row">
+            <button class="btn-ghost" :disabled="responding" @click="respond('reject')">
+              {{ responding ? 'Please wait...' : 'Reject' }}
             </button>
-            <button class="btn-primary" :disabled="responding" @click="respondToRequest('accept')">
+            <button class="btn-primary" :disabled="responding" @click="respond('accept')">
               {{ responding ? 'Please wait...' : 'Accept' }}
             </button>
           </div>
+
+          <p v-else-if="selectedTrade.status === 'PENDING'" class="trade-hint">
+            Waiting for {{ otherParty(selectedTrade) }} to respond.
+          </p>
 
         </div>
       </div>
@@ -148,50 +161,62 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { get_api, post_api } from '@/services/api.js'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth.js'
 
-const router = useRouter()
 const authStore = useAuthStore()
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
-const friends = ref([])
+const trades  = ref([])
 const loading = ref(true)
 const error   = ref(null)
 
-const pendingRequests = ref([])
-
 const filters = reactive({
-  pseudo:   '',
-  status:   '',
-  role:     '',
+  friend:    '',
+  status:    '',
+  direction: '',
+  maxPrice:  null,
 })
 
 // ── Computed ──────────────────────────────────────────────────────────────────
 
-const filteredFriends = computed(() =>
-  friends.value.filter(f => {
-    if (filters.pseudo   && !f.pseudo.toLowerCase().includes(filters.pseudo.toLowerCase())) return false
-    if (filters.status   && f.status !== filters.status)                                    return false
-    if (filters.role     && f.role   !== filters.role.toUpperCase())                        return false
-    return true 
+const filteredTrades = computed(() =>
+  trades.value.filter(t => {
+    const party = otherParty(t).toLowerCase()
+    if (filters.friend    && !party.includes(filters.friend.toLowerCase()))  return false
+    if (filters.status    && t.status !== filters.status)                   return false
+    if (filters.direction && direction(t) !== filters.direction)            return false
+    if (filters.maxPrice != null && t.price > filters.maxPrice)             return false
+    return true
   })
 )
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+function direction(trade) {
+  return trade.initiatorPseudo === authStore.pseudo ? 'SENT' : 'RECEIVED'
+}
+
+function otherParty(trade) {
+  return direction(trade) === 'SENT' ? trade.receiverPseudo : trade.initiatorPseudo
+}
+
+function fishNames(trade) {
+  if (!trade.fish || trade.fish.length === 0) return 'No fish'
+  return trade.fish.map(f => f.name).join(', ')
+}
+
 function formatDate(dt) {
   if (!dt) return '—'
-  return new Date(dt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })
+  return new Date(dt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 
 function statusClass(status) {
   return {
-    ACCEPTED: 'badge--accepted',
     PENDING:  'badge--pending',
-    BLOCKED:  'badge--blocked',
+    ACCEPTED: 'badge--accepted',
+    REJECTED: 'badge--rejected',
   }[status] ?? ''
 }
 
@@ -211,68 +236,52 @@ function showToast(message, type = 'success') {
 // ── Filters ───────────────────────────────────────────────────────────────────
 
 function resetFilters() {
-  Object.assign(filters, { pseudo: '', status: '', role: ''})
+  Object.assign(filters, { friend: '', status: '', direction: '', maxPrice: null })
 }
 
 // ── Load ──────────────────────────────────────────────────────────────────────
 
-async function loadFriends() {
+async function loadTrades() {
   loading.value = true
   error.value   = null
   try {
-    friends.value = await get_api(`/api/friendships/${authStore.pseudo}/friends`)
+    trades.value = await get_api(`/api/trades/user/${authStore.pseudo}`)
   } catch {
-    error.value = 'Could not load your friends. Please try again.'
+    error.value = 'Could not load trades. Please try again.'
   } finally {
     loading.value = false
   }
 }
 
-async function loadPendingRequests() {
-  try {
-    pendingRequests.value = await get_api(`/api/friendships/${authStore.pseudo}/pending`)
-  } catch {
-    pendingRequests.value = []
-  }
+// ── Popup ─────────────────────────────────────────────────────────────────────
+
+const selectedTrade = ref(null)
+const responding    = ref(false)
+
+function openTradePopup(trade) {
+  selectedTrade.value = trade
 }
 
-// ── Pending request popup ────────────────────────────────────────────────────
-
-const selectedRequest = ref(null)
-const responding      = ref(false)
-
-function openRequestPopup(req) {
-  selectedRequest.value = req
+function closeTradePopup() {
+  selectedTrade.value = null
 }
 
-function closeRequestPopup() {
-  selectedRequest.value = null
-}
-
-function goToProfile(pseudo) {
-  closeRequestPopup()
-  router.push(`/users/${pseudo}`)
-}
-
-async function respondToRequest(action) {
-  if (!selectedRequest.value) return
+async function respond(action) {
+  if (!selectedTrade.value) return
   responding.value = true
-  const requesterPseudo = selectedRequest.value.pseudo
-  const endpoint = action === 'accept' ? 'accept-friend' : 'reject-friend'
+  const tradeId = selectedTrade.value.id
+  const endpoint = action === 'accept' ? 'accept' : 'reject'
 
   try {
-    await post_api(
-      `/api/friendships/${authStore.pseudo}/${endpoint}?friendPseudo=${encodeURIComponent(requesterPseudo)}`,
-      {}
-    )
+    await post_api(`/api/trades/${tradeId}/${endpoint}`, {})
     showToast(
-      action === 'accept' ? `You're now friends with ${requesterPseudo}.` : `Request from ${requesterPseudo} declined.`,
+      action === 'accept' ? 'Trade accepted!' : 'Trade rejected.',
       'success'
     )
-    closeRequestPopup()
-    await Promise.all([loadFriends(), loadPendingRequests()])
+    closeTradePopup()
+    await loadTrades()
   } catch {
-    showToast('Could not process this request. Please try again.', 'error')
+    showToast('Could not process this trade. Please try again.', 'error')
   } finally {
     responding.value = false
   }
@@ -280,16 +289,13 @@ async function respondToRequest(action) {
 
 // ── Lifecycle ─────────────────────────────────────────────────────────────────
 
-onMounted(() => {
-  loadFriends()
-  loadPendingRequests()
-})
+onMounted(loadTrades)
 </script>
 
 <style scoped>
 /* ── Layout ── */
-.friends-layout {
-  max-width: 900px;
+.trades-layout {
+  max-width: 800px;
   margin: 2rem auto;
   padding: 0 1.5rem;
   display: flex;
@@ -305,77 +311,6 @@ onMounted(() => {
   margin-bottom: 0.2rem;
 }
 .page-subtitle { font-size: 0.82rem; color: #aaa; }
-
-/* ── Pending requests ── */
-.pending-card {
-  background: #fff8ee;
-  border: 1.5px solid #ffe7bf;
-  border-radius: 14px;
-  padding: 1.2rem 1.5rem;
-}
-
-.pending-header {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.9rem;
-}
-
-.section-title {
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #f5a623;
-}
-
-.pending-count {
-  background: #f5a623;
-  color: #fff;
-  font-size: 0.72rem;
-  font-weight: 700;
-  border-radius: 999px;
-  padding: 0.1rem 0.55rem;
-}
-
-.pending-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-}
-
-.pending-chip {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #fff;
-  border: 1px solid #ffe7bf;
-  border-radius: 999px;
-  padding: 0.35rem 0.9rem 0.35rem 0.35rem;
-  cursor: pointer;
-  transition: box-shadow 0.2s, transform 0.15s;
-}
-.pending-chip:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transform: translateY(-1px);
-}
-
-.pending-avatar {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  background: #f5a623;
-  color: #fff;
-  font-size: 0.78rem;
-  font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-
-.pending-pseudo {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #1a3a4a;
-}
 
 /* ── Filters ── */
 .filters-card {
@@ -419,74 +354,88 @@ select {
 }
 input:focus, select:focus { border-color: #0d7377; background: #fff; }
 
-/* ── Friends grid ── */
-.friends-grid {
+/* ── Trades list ── */
+.trades-list {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 0.7rem;
 }
 
-.friend-card {
+.trade-card {
   background: #fff;
+  border: none;
   border-radius: 14px;
-  padding: 1rem 1.4rem;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  padding: 1rem 1.3rem;
   display: flex;
   align-items: center;
-  gap: 1.2rem;
+  gap: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
   transition: box-shadow 0.2s, transform 0.15s;
 }
-.friend-card:hover {
+.trade-card:hover {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   transform: translateY(-1px);
 }
 
-/* Avatar */
-.friend-avatar {
-  width: 46px; height: 46px;
+.trade-avatar {
+  width: 44px; height: 44px;
   border-radius: 50%;
   background: #0d7377;
   color: #fff;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 700;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
+.trade-avatar--lg { width: 52px; height: 52px; font-size: 1.3rem; }
 
-/* Info */
-.friend-info {
+.trade-info {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+  min-width: 0;
 }
-.friend-pseudo {
-  font-size: 0.95rem;
-  color: #1a3a4a;
-}
-.friend-since {
+.trade-pseudo { font-size: 0.95rem; color: #1a3a4a; }
+.trade-fish-names {
   font-size: 0.78rem;
   color: #aaa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Badges */
-.friend-badges {
+.trade-meta {
   display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  flex-shrink: 0;
 }
 
+.trade-price {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f5a623;
+}
+
+/* ── Badges ── */
 .badge {
   display: inline-block;
   border-radius: 999px;
-  padding: 0.2rem 0.75rem;
-  font-size: 0.75rem;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.74rem;
   font-weight: 600;
 }
-.badge--role     { background: #f0f4f8; color: #555; }
-.badge--accepted { background: #e8f7f7; color: #0d7377; }
 .badge--pending  { background: #fff8ee; color: #f5a623; }
-.badge--blocked  { background: #fde8e8; color: #e74c3c; }
+.badge--accepted { background: #e8f7f7; color: #0d7377; }
+.badge--rejected { background: #fde8e8; color: #e74c3c; }
 
 /* ── States ── */
 .state-box {
@@ -579,7 +528,7 @@ input:focus, select:focus { border-color: #0d7377; background: #fff; }
   border-radius: 16px;
   padding: 1.8rem;
   width: 100%;
-  max-width: 380px;
+  max-width: 400px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.15);
   position: relative;
 }
@@ -604,49 +553,46 @@ input:focus, select:focus { border-color: #0d7377; background: #fff; }
   margin-bottom: 1.2rem;
 }
 
-.request-profile {
+.trade-detail-header {
   display: flex;
   align-items: center;
   gap: 0.9rem;
-  width: 100%;
-  border: 1.5px solid #f0f4f8;
-  border-radius: 12px;
-  padding: 0.8rem 1rem;
-  background: #fafbfc;
-  cursor: pointer;
-  text-align: left;
-  transition: border-color 0.2s, background 0.2s;
+  margin-bottom: 1.2rem;
 }
-.request-profile:hover {
-  border-color: #0d7377;
-  background: #f8fbfb;
+.trade-detail-header strong {
+  display: block;
+  font-size: 1rem;
+  color: #1a3a4a;
 }
-
-.request-avatar {
-  width: 48px; height: 48px;
-  border-radius: 50%;
-  background: #0d7377;
-  color: #fff;
-  font-size: 1.2rem;
-  font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-
-.request-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-.request-info strong { font-size: 0.98rem; color: #1a3a4a; }
-
-.request-chevron { color: #ccc; flex-shrink: 0; }
-
-.request-hint {
+.trade-direction {
   font-size: 0.78rem;
   color: #aaa;
-  margin-top: 0.7rem;
+}
+
+.trade-detail-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1rem 0;
+  border-top: 1px solid #f0f4f8;
+  border-bottom: 1px solid #f0f4f8;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.88rem;
+}
+.detail-row span { color: #888; }
+.detail-row strong { color: #1a3a4a; text-align: right; }
+.price-highlight { color: #f5a623 !important; }
+
+.trade-hint {
+  font-size: 0.82rem;
+  color: #aaa;
+  text-align: center;
+  margin-top: 1.2rem;
 }
 
 .btn-row {
@@ -664,7 +610,7 @@ input:focus, select:focus { border-color: #0d7377; background: #fff; }
 
 /* ── Responsive ── */
 @media (max-width: 560px) {
-  .friend-card { flex-wrap: wrap; }
-  .friend-badges { order: 3; }
+  .trade-card { flex-wrap: wrap; }
+  .trade-meta { align-items: flex-start; }
 }
 </style>

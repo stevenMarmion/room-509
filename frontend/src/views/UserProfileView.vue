@@ -222,7 +222,7 @@ async function loadFish() {
 async function loadFriendStatus() {
   if (!authStore.pseudo || isOwnProfile.value) return
   try {
-    const friends = await get_api(`/api/users/${user.pseudo}/friends`)
+    const friends = await get_api(`/api/friendships/${user.pseudo}/friends`)
     const match = friends.find(f => f.pseudo === authStore.pseudo)
     friendStatus.value = match ? match.status : 'NONE'
   } catch {
@@ -249,7 +249,7 @@ async function sendFriendRequest() {
   sendingRequest.value = true
   try {
     await post_api(
-      `/api/users/${authStore.pseudo}/add-friend?friendPseudo=${encodeURIComponent(user.pseudo)}`,
+      `/api/friendships/${authStore.pseudo}/add-friend?friendPseudo=${encodeURIComponent(user.pseudo)}`,
       {}
     )
     friendStatus.value = 'PENDING'

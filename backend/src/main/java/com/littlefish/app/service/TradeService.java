@@ -1,5 +1,6 @@
 package com.littlefish.app.service;
 
+import com.littlefish.app.dto.TradeDTO;
 import com.littlefish.app.model.Trade;
 import com.littlefish.app.model.enums.TradeStatus;
 import com.littlefish.app.repository.TradeRepository;
@@ -26,6 +27,8 @@ public class TradeService {
     }
 
     public Trade save(Trade trade) {
+        trade.setInitiator(userService.findByPseudo(trade.getInitiator().getPseudo()).orElse(null));
+        trade.setReceiver(userService.findById(trade.getReceiver().getId()).orElse(null));
         trade.setStatus(TradeStatus.PENDING);
         trade.setCreatedAt(LocalDateTime.now());
         return tradeRepository.save(trade);
@@ -75,5 +78,24 @@ public class TradeService {
             return Optional.of(tradeRepository.save(existingTrade));
         }
         return Optional.empty();
+    }
+    
+    public TradeDTO toDTO(Trade trade) {
+        return new TradeDTO(
+            trade.getId(),
+            trade.getStatus(),
+            trade.getCreatedAt(),
+            trade.getPrice(),
+            trade.getInitiator().getPseudo(),
+            trade.getReceiver().getPseudo(),
+            trade.getFish()
+        );
+    }
+
+    public List<TradeDTO> findByPseudo(String pseudo) {
+        return tradeRepository.findByInitiator_PseudoOrReceiver_Pseudo(pseudo, pseudo)
+            .stream()
+            .map(this::toDTO)
+            .toList();
     }
 }

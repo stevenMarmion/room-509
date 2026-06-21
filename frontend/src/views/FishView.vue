@@ -1,6 +1,13 @@
 <template>
   <main class="fishes-layout">
 
+    <!-- ── Toast ── -->
+    <Transition name="toast">
+      <div v-if="toast.visible" class="toast-notif" :class="`toast-notif--${toast.type}`">
+        {{ toast.message }}
+      </div>
+    </Transition>
+
     <!-- ── Header ── -->
     <div class="page-header">
       <div>
@@ -78,6 +85,7 @@
             <th @click="sortBy('age')"       class="sortable">Age        <SortIcon field="age"         :current="sort" /></th>
             <th @click="sortBy('lifePoints')" class="sortable">Life pts   <SortIcon field="lifePoints" :current="sort" /></th>
             <th>Last fed</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -98,17 +106,93 @@
               </div>
             </td>
             <td class="td-date">{{ formatDate(fish.lastFedAt) }}</td>
+            <td>
+              <div class="td-actions">
+                <button class="icon-btn" title="Rename" @click="openEditPopup(fish)">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                  </svg>
+                </button>
+                <button class="icon-btn" title="Trade" @click="openTradePopup(fish)">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="17 1 21 5 17 9" /><path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                    <polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                  </svg>
+                </button>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
   </main>
+
+  <!-- ── Edit name popup ── -->
+  <Teleport to="body">
+    <Transition name="modal">
+      <div v-if="editingFish" class="modal-backdrop" @click.self="closeEditPopup">
+        <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+          <h3 id="edit-modal-title">Rename fish</h3>
+          <form @submit.prevent="saveFishName">
+            <div class="form-group">
+              <label for="fish-name">Name</label>
+              <input id="fish-name" type="text" v-model="editName" autofocus />
+            </div>
+            <div class="btn-row">
+              <button type="button" class="btn-ghost" @click="closeEditPopup">Cancel</button>
+              <button type="submit" class="btn-primary" :disabled="savingName || !editName.trim()">
+                {{ savingName ? 'Saving...' : 'Save' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+
+  <!-- ── Trade popup ── -->
+  <Teleport to="body">
+    <Transition name="modal">
+      <div v-if="tradingFish" class="modal-backdrop" @click.self="closeTradePopup">
+        <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="trade-modal-title">
+          <h3 id="trade-modal-title">Trade "{{ tradingFish.name }}"</h3>
+
+          <form @submit.prevent="submitTrade">
+
+            <div class="form-group">
+              <label for="trade-friend">Friend</label>
+              <select id="trade-friend" v-model="tradeForm.friendPseudo" required :disabled="loadingFriends">
+                <option value="" disabled>{{ loadingFriends ? 'Loading friends...' : 'Select a friend' }}</option>
+                <option v-for="f in friends" :key="f.pseudo" :value="f.pseudo">{{ f.pseudo }}</option>
+              </select>
+              <p v-if="!loadingFriends && friends.length === 0" class="form-hint">
+                You have no friends yet to trade with.
+              </p>
+            </div>
+
+            <div class="form-group" style="margin-top: 0.9rem;">
+              <label for="trade-price">Price (coins)</label>
+              <input id="trade-price" type="number" v-model.number="tradeForm.price" min="1" required />
+            </div>
+
+            <div class="btn-row">
+              <button type="button" class="btn-ghost" @click="closeTradePopup">Cancel</button>
+              <button type="submit" class="btn-primary" :disabled="submittingTrade || friends.length === 0">
+                {{ submittingTrade ? 'Sending...' : 'Propose trade' }}
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import { get_api } from '@/services/api.js'
+import { get_api, put_api, post_api } from '@/services/api.js'
 import { useAuthStore } from '@/stores/auth.js'
 
 const authStore = useAuthStore()
@@ -176,7 +260,6 @@ function formatDate(dt) {
   })
 }
 
-// Map a life points value (0–100) to a color
 function lifePercent(lp) { return Math.min(100, Math.max(0, lp)) }
 function lifeColor(lp) {
   if (lp >= 70) return '#0d7377'
@@ -184,7 +267,6 @@ function lifeColor(lp) {
   return '#e74c3c'
 }
 
-// Give a subtle tinted background based on the color name
 const COLOR_MAP = {
   red: '#ffe5e5', orange: '#fff3e0', yellow: '#fffde7',
   green: '#e8f5e9', blue: '#e3f2fd', purple: '#f3e5f5',
@@ -193,6 +275,19 @@ const COLOR_MAP = {
 }
 function colorHint(color) {
   return COLOR_MAP[color?.toLowerCase()] ?? '#e8f7f7'
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+
+const toast = reactive({ visible: false, message: '', type: 'success' })
+let toastTimer = null
+
+function showToast(message, type = 'success') {
+  clearTimeout(toastTimer)
+  toast.message = message
+  toast.type    = type
+  toast.visible = true
+  toastTimer = setTimeout(() => { toast.visible = false }, 3500)
 }
 
 // ── Sort ──────────────────────────────────────────────────────────────────────
@@ -212,18 +307,106 @@ function resetFilters() {
   Object.assign(filters, { name: '', species: '', color: '', minLifePoints: null, maxAge: null })
 }
 
-// ── Load ──────────────────────────────────────────────────────────────────────
+// ── Load fish ─────────────────────────────────────────────────────────────────
 
 async function loadFishes() {
   loading.value = true
   error.value   = null
   try {
-    // Replace 'alice' with the actual logged-in user pseudo
     fishes.value = await get_api(`/api/users/${authStore.pseudo}/fishes`)
   } catch {
     error.value = 'Could not load your fish. Please try again.'
   } finally {
     loading.value = false
+  }
+}
+
+// ── Edit name popup ───────────────────────────────────────────────────────────
+
+const editingFish = ref(null)
+const editName    = ref('')
+const savingName  = ref(false)
+
+function openEditPopup(fish) {
+  editingFish.value = fish
+  editName.value    = fish.name
+}
+
+function closeEditPopup() {
+  editingFish.value = null
+}
+
+async function saveFishName() {
+  const newName = editName.value.trim()
+  if (!newName || !editingFish.value) return
+
+  savingName.value = true
+  try {
+    await put_api(`/api/fish/${editingFish.value.id}`, newName)
+    editingFish.value.name = newName
+    showToast('Fish renamed successfully.', 'success')
+    closeEditPopup()
+  } catch {
+    showToast('Could not rename fish. Please try again.', 'error')
+  } finally {
+    savingName.value = false
+  }
+}
+
+// ── Trade popup ───────────────────────────────────────────────────────────────
+
+const tradingFish     = ref(null)
+const friends         = ref([])
+const loadingFriends  = ref(false)
+const submittingTrade = ref(false)
+
+const tradeForm = reactive({ friendPseudo: '', price: 50 })
+
+async function openTradePopup(fish) {
+  tradingFish.value = fish
+  tradeForm.friendPseudo = ''
+  tradeForm.price = 50
+  await loadFriends()
+}
+
+function closeTradePopup() {
+  tradingFish.value = null
+}
+
+async function loadFriends() {
+  loadingFriends.value = true
+  try {
+    const allFriendships = await get_api(`/api/friendships/${authStore.pseudo}/friends`)
+    friends.value = allFriendships.filter(f => f.status === 'ACCEPTED')
+  } catch {
+    friends.value = []
+  } finally {
+    loadingFriends.value = false
+  }
+}
+
+async function submitTrade() {
+  if (!tradingFish.value || !tradeForm.friendPseudo) return
+
+  submittingTrade.value = true
+  try {
+    // Fetch receiver's id from their pseudo
+    const receiverUser = await get_api(`/api/users/${tradeForm.friendPseudo}`)
+
+    await post_api('/api/trades', {
+      status:    'PENDING',
+      price:     tradeForm.price,
+      initiator: { pseudo: authStore.pseudo },
+      receiver:  { id: receiverUser.id },
+      fish:      [{ id: tradingFish.value.id }],
+    })
+
+    showToast(`Trade proposed to ${tradeForm.friendPseudo}.`, 'success')
+    closeTradePopup()
+  } catch {
+    showToast('Could not propose this trade. Please try again.', 'error')
+  } finally {
+    submittingTrade.value = false
   }
 }
 
@@ -285,7 +468,8 @@ onMounted(loadFishes)
 }
 
 input[type="text"],
-input[type="number"] {
+input[type="number"],
+select {
   border: 1.5px solid #dde3ea;
   border-radius: 8px;
   padding: 0.5rem 0.75rem;
@@ -296,7 +480,7 @@ input[type="number"] {
   transition: border-color 0.2s;
   width: 100%;
 }
-input:focus { border-color: #0d7377; background: #fff; }
+input:focus, select:focus { border-color: #0d7377; background: #fff; }
 
 /* ── Table ── */
 .table-wrapper {
@@ -355,6 +539,30 @@ td {
 
 .td-name { font-weight: 600; }
 .td-date { font-size: 0.82rem; color: #aaa; white-space: nowrap; }
+
+/* ── Actions ── */
+.td-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.icon-btn {
+  width: 30px; height: 30px;
+  border: 1.5px solid #dde3ea;
+  border-radius: 8px;
+  background: #fff;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.icon-btn:hover {
+  border-color: #0d7377;
+  color: #0d7377;
+  background: #f8fbfb;
+}
 
 /* ── Color badge ── */
 .color-badge {
@@ -421,9 +629,100 @@ td {
   background: #f0f4f8;
   color: #555;
   transition: opacity 0.2s;
-  width: 100%;
 }
-.btn-ghost:hover { opacity: 0.8; }
+.btn-ghost:hover:not(:disabled) { opacity: 0.8; }
+.btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-primary {
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 1.2rem;
+  font-size: 0.88rem;
+  cursor: pointer;
+  font-weight: 600;
+  background: #0d7377;
+  color: #fff;
+  transition: opacity 0.2s;
+}
+.btn-primary:hover:not(:disabled) { opacity: 0.85; }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Toast ── */
+.toast-notif {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.7rem 1.4rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  white-space: nowrap;
+}
+.toast-notif--success { background: #0d7377; }
+.toast-notif--error   { background: #e74c3c; }
+
+.toast-enter-active, .toast-leave-active { transition: opacity 0.3s, transform 0.3s; }
+.toast-enter-from, .toast-leave-to { opacity: 0; transform: translateX(-50%) translateY(10px); }
+
+/* ── Modal ── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 1rem;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.8rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+
+.modal-box h3 {
+  font-size: 1.05rem;
+  color: #1a3a4a;
+  margin-bottom: 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.form-group label {
+  font-size: 0.82rem;
+  color: #666;
+  font-weight: 500;
+}
+.form-hint {
+  font-size: 0.78rem;
+  color: #e74c3c;
+  margin-top: 0.3rem;
+}
+
+.btn-row {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 1.4rem;
+}
+.btn-row .btn-ghost,
+.btn-row .btn-primary {
+  flex: 1;
+}
+
+.modal-enter-active, .modal-leave-active { transition: opacity 0.25s, transform 0.25s; }
+.modal-enter-from, .modal-leave-to { opacity: 0; transform: scale(0.96); }
 
 /* ── Responsive ── */
 @media (max-width: 600px) {

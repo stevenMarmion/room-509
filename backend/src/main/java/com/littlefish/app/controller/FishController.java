@@ -24,4 +24,11 @@ public class FishController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Fish> updateName(@PathVariable Long id, @RequestBody String fishName) {
+        return fishService.updateName(id, fishName)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 }
