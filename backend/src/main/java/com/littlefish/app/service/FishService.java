@@ -21,4 +21,15 @@ public class FishService {
     public Optional<Fish> findById(Long id) {
         return fishRepository.findById(id);
     }
+
+    public Optional<Fish> updateName(Long id, String newName) {
+        Optional<Fish> fishOptional = fishRepository.findById(id);
+        if (fishOptional.isPresent()) {
+            Fish fish = fishOptional.get();
+            fish.setName(newName);
+            fishRepository.save(fish);
+            return Optional.of(fish);
+        }
+        return Optional.empty();
+    }
 }

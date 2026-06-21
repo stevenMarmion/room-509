@@ -1,13 +1,12 @@
 package com.littlefish.app.service;
 
-import com.littlefish.app.dto.FriendshipDTO;
 import com.littlefish.app.model.Aquarium;
-import com.littlefish.app.model.Friendship;
+import com.littlefish.app.model.Fish;
 import com.littlefish.app.model.NotificationPreference;
 import com.littlefish.app.model.User;
-import com.littlefish.app.model.enums.FriendStatus;
 import com.littlefish.app.model.enums.Role;
 import com.littlefish.app.model.enums.Theme;
+import com.littlefish.app.repository.FishRepository;
 import com.littlefish.app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +24,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final FishRepository fishRepository;
     private final PasswordEncoder passwordEncoder;
     private final DailyChallengeService dailyChallengeService;
 
@@ -55,13 +55,26 @@ public class UserService {
         user.setTheme(Theme.LIGHT);
         user.setCreatedAt(LocalDateTime.now());
 
+        List<Fish> availableFishes = fishRepository.findAll();
+        Fish selectedFish = availableFishes.get((int) (Math.random() * availableFishes.size()));
+        Fish fishCopy = new Fish();
+        fishCopy.setName(selectedFish.getName());
+        fishCopy.setSpecies(selectedFish.getSpecies());
+        fishCopy.setColor(selectedFish.getColor());
+        fishCopy.setSize(selectedFish.getSize());
+        fishCopy.setAge(selectedFish.getAge());
+        fishCopy.setLifePoints(selectedFish.getLifePoints());
+        fishCopy.setLastFedAt(LocalDateTime.now());
+
         Aquarium aquarium = new Aquarium();
-        aquarium.setName(user.getPseudo() + "'s Aquarium");
+        aquarium.setName("Aquarium");
         aquarium.setPublic(false);
         aquarium.setLevel(1);
         aquarium.setCapacity(10);
         aquarium.setUser(user);
-        aquarium.setFish(List.of());
+        aquarium.setFish(List.of(fishCopy));
+
+        fishCopy.setAquarium(aquarium);
         user.setAquarium(aquarium);
 
         NotificationPreference notificationPreference = new NotificationPreference();
@@ -101,85 +114,7 @@ public class UserService {
         return Optional.of(userRepository.save(existingUser));
     }
 
-    public Optional<User> addFriend(String pseudo, String friendPseudo) {
-        User user = userRepository.findByPseudo(pseudo).orElse(null);
-        User friend = userRepository.findByPseudo(friendPseudo).orElse(null);
-
-        if (user == null || friend == null) {
-            return Optional.empty();
-        }
-
-        Friendship friendship = new Friendship();
-        friendship.setRequester(user);
-        friendship.setAddressee(friend);
-        friendship.setStatus(FriendStatus.PENDING);
-        friendship.setSince(LocalDateTime.now());
-
-        user.getFriendships().add(friendship);
-        userRepository.save(user);
-
-        return Optional.of(user);
-    }
-
-    public Optional<User> acceptFriend(String pseudo, String friendPseudo) {
-        User user = userRepository.findByPseudo(pseudo).orElse(null);
-        User friend = userRepository.findByPseudo(friendPseudo).orElse(null);
-
-        if (user == null || friend == null) {
-            return Optional.empty();
-        }
-
-        Friendship friendship = user.getFriendships().stream()
-            .filter(f -> f.getRequester().equals(friend) && f.getAddressee().equals(user))
-            .findFirst()
-            .orElse(null);
-
-        if (friendship == null) {
-            return Optional.empty();
-        }
-
-        friendship.setStatus(FriendStatus.ACCEPTED);
-        userRepository.save(user);
-
-        return Optional.of(user);
-    }
-
-    public Optional<User> rejectFriend(String pseudo, String friendPseudo) {
-        User user = userRepository.findByPseudo(pseudo).orElse(null);
-        User friend = userRepository.findByPseudo(friendPseudo).orElse(null);
-
-        if (user == null || friend == null) {
-            return Optional.empty();
-        }
-
-        Friendship friendship = user.getFriendships().stream()
-            .filter(f -> f.getRequester().equals(friend) && f.getAddressee().equals(user))
-            .findFirst()
-            .orElse(null);
-
-        if (friendship == null) {
-            return Optional.empty();
-        }
-
-        friendship.setStatus(FriendStatus.BLOCKED);
-        userRepository.save(user);
-
-        return Optional.of(user);
-    }
-
     public void deleteByPseudo(String pseudo) {
         userRepository.deleteByPseudo(pseudo);
-    }
-
-    public FriendshipDTO toDTO(Friendship f, String requesterPseudo) {
-        User friend = f.getRequester().getPseudo().equals(requesterPseudo) ? f.getAddressee(): f.getRequester();
-
-        return new FriendshipDTO(
-            f.getStatus(),
-            f.getSince(),
-            friend.getPseudo(),
-            f.getSince(),
-            friend.getRole().name()
-        );
     }
 }

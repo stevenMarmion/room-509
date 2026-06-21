@@ -45,7 +45,7 @@ CREATE TABLE aquarium (
 -- ------------------------------------------------------------
 CREATE TABLE fish (
     id            BIGSERIAL    PRIMARY KEY,
-    aquarium_id   BIGINT       REFERENCES aquarium(id) ON DELETE SET NULL,
+    aquarium_id   BIGINT       NOT NULL REFERENCES aquarium(id) ON DELETE CASCADE,
     name          VARCHAR(100) NOT NULL,
     species       VARCHAR(100),
     color         VARCHAR(50),
@@ -138,8 +138,8 @@ CREATE TABLE config (
 -- ============================================================
 
 INSERT INTO users (pseudo, email, password, theme, coins, role) VALUES
-    ('alice', 'alice@example.com', '$2a$10$7QJ8Z1e2Kp3mN5oP6qR8SuXvYwZaAbBcCdDeEfFgGhHiIjJkKlLm', 'LIGHT', 100, 'USER'),
-    ('bob',   'bob@example.com',   '$2a$10$7QJ8Z1e2Kp3mN5oP6qR8SuXvYwZaAbBcCdDeEfFgGhHiIjJkKlLm', 'DARK',   50, 'USER'),
+    ('alice', 'alice@example.com', '$2a$10$7QJ8Z1e2Kp3mN5oP6qR8SuXvYwZaAbBcCdDeEfFgGhHiIjJkKlLm', 'LIGHT', 200, 'USER'),
+    ('bob',   'bob@example.com',   '$2a$10$7QJ8Z1e2Kp3mN5oP6qR8SuXvYwZaAbBcCdDeEfFgGhHiIjJkKlLm', 'DARK',  50, 'USER'),
     ('admin', 'admin@example.com', '$2a$10$7QJ8Z1e2Kp3mN5oP6qR8SuXvYwZaAbBcCdDeEfFgGhHiIjJkKlLm', 'LIGHT', 500, 'ADMIN');
 
 INSERT INTO notification_preference (user_id, notify_on_death, notify_before_death, daily_reminder) VALUES
