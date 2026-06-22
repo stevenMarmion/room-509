@@ -394,11 +394,10 @@ async function submitTrade() {
     const receiverUser = await get_api(`/api/users/${tradeForm.friendPseudo}`)
 
     await post_api('/api/trades', {
-      status:    'PENDING',
-      price:     tradeForm.price,
-      initiator: { pseudo: authStore.pseudo },
-      receiver:  { id: receiverUser.id },
-      fish:      [{ id: tradingFish.value.id }],
+      initiatorPseudo: authStore.pseudo,
+      receiverId:      receiverUser.id,
+      price:           tradeForm.price,
+      fishIds:         [tradingFish.value.id],
     })
 
     showToast(`Trade proposed to ${tradeForm.friendPseudo}.`, 'success')
