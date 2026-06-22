@@ -2,10 +2,12 @@ package com.littlefish.app.service;
 
 import com.littlefish.app.dto.CreateTradeRequest;
 import com.littlefish.app.dto.TradeDTO;
+import com.littlefish.app.model.Aquarium;
 import com.littlefish.app.model.Fish;
 import com.littlefish.app.model.Trade;
 import com.littlefish.app.model.User;
 import com.littlefish.app.model.enums.TradeStatus;
+import com.littlefish.app.repository.FishRepository;
 import com.littlefish.app.repository.TradeRepository;
 import com.littlefish.app.repository.UserRepository;
 
@@ -22,6 +24,7 @@ public class TradeService {
 
     private final TradeRepository tradeRepository;
     private final UserRepository userRepository;
+    private final FishRepository fishRepository;
     private final UserService userService;
     private final FishService fishService;
 
@@ -86,9 +89,16 @@ public class TradeService {
         List<Fish> tradedFish = existingTrade.getFish();
 
         initiator.setCoins(initiator.getCoins() + existingTrade.getPrice());
-        initiator.getAquarium().getFish().removeAll(tradedFish);
         receiver.setCoins(receiver.getCoins() - existingTrade.getPrice());
-        receiver.getAquarium().getFish().addAll(tradedFish);
+
+        Aquarium receiverAquarium = receiver.getAquarium();
+        for (Fish fish : tradedFish) {
+            fish.setAquarium(receiverAquarium);
+            fishRepository.save(fish);
+        }
+
+        initiator.getAquarium().getFish().removeAll(tradedFish);
+        receiverAquarium.getFish().addAll(tradedFish);
 
         userRepository.save(initiator);
         userRepository.save(receiver);
