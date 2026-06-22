@@ -21,6 +21,7 @@ public class Fish {
     private String name;
     private String species;
     private String color;
+    private int price;
     private int size;
     private int age;
     private int lifePoints;

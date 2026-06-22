@@ -28,6 +28,9 @@
       <button class="tab" :class="{ 'tab--active': activeTab === 'upgrades' }" @click="activeTab = 'upgrades'">
         Aquarium upgrades
       </button>
+      <button class="tab" :class="{ 'tab--active': activeTab === 'fish' }"     @click="activeTab = 'fish'">
+        Fish
+      </button>
     </div>
 
     <!-- ══ FOOD TAB ══ -->
@@ -195,6 +198,81 @@
 
     </template>
 
+    <!-- ══ FISH TAB ══ -->
+    <template v-if="activeTab === 'fish'">
+      <div class="filters-card">
+        <div class="filter-group">
+          <label>Name</label>
+          <input type="text" v-model="fishFilters.name" placeholder="Search fish..." />
+        </div>
+        <div class="filter-group">
+          <label>Max. price</label>
+          <input type="number" v-model.number="fishFilters.maxPrice" placeholder="Any" min="0" />
+        </div>
+        <div class="filter-group">
+          <label>Species</label>
+          <input type="text" v-model="fishFilters.species" placeholder="Any species..." />
+        </div>
+        <div class="filter-group filter-group--reset">
+          <button class="btn-ghost" @click="resetFishFilters">Reset</button>
+        </div>
+      </div>
+
+      <div v-if="loadingFish" class="state-box">
+        <div class="spinner"></div>
+        <p>Loading fish...</p>
+      </div>
+      <div v-else-if="errorFish" class="state-box state-box--error">
+        <p>{{ errorFish }}</p>
+        <button class="btn-ghost" @click="loadFish">Try again</button>
+      </div>
+      <div v-else-if="filteredFish.length === 0" class="state-box">
+        <p>No fish matches your filters.</p>
+      </div>
+      <div v-else class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th @click="sortFishFn('name')"    class="sortable">Name    <SortIcon field="name"    :current="fishSort" /></th>
+              <th @click="sortFishFn('species')" class="sortable">Species <SortIcon field="species" :current="fishSort" /></th>
+              <th @click="sortFishFn('price')"   class="sortable">Price   <SortIcon field="price"   :current="fishSort" /></th>
+              <th>Color</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in filteredFish" :key="item.id">
+              <td class="td-name">{{ item.name }}</td>
+              <td>{{ item.species ?? '—' }}</td>
+              <td>
+                <span class="price-badge">
+                  <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+                  {{ item.price }}
+                </span>
+              </td>
+              <td>
+                <span v-if="item.color" class="color-dot-wrap">
+                  <span class="color-dot" :style="{ background: item.color.toLowerCase() }"></span>
+                  {{ item.color }}
+                </span>
+                <span v-else>—</span>
+              </td>
+              <td>
+                <button
+                  class="btn-buy"
+                  :disabled="userCoins < item.price"
+                  :title="userCoins < item.price ? 'Not enough coins' : ''"
+                  @click="buy('fish', item)"
+                >
+                  Buy
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </template>
+
   </main>
 </template>
 
@@ -230,6 +308,47 @@ const errorFood     = ref(null)
 const upgrades        = ref([])
 const loadingUpgrades = ref(true)
 const errorUpgrades   = ref(null)
+
+// State
+const fish          = ref([])
+const loadingFish   = ref(true)
+const errorFish     = ref(null)
+
+// Filters & sort
+const fishFilters = reactive({ name: '', maxPrice: null, species: '' })
+const fishSort    = reactive({ field: 'name', dir: 'asc' })
+
+function resetFishFilters() { Object.assign(fishFilters, { name: '', maxPrice: null, species: '' }) }
+function sortFishFn(field)  { toggleSort(fishSort, field) }
+
+// Computed
+const filteredFish = computed(() => {
+  const filtered = fish.value.filter(f => {
+    if (fishFilters.name     && !f.name.toLowerCase().includes(fishFilters.name.toLowerCase()))       return false
+    if (fishFilters.species  && !f.species?.toLowerCase().includes(fishFilters.species.toLowerCase())) return false
+    if (fishFilters.maxPrice != null && f.price > fishFilters.maxPrice)                               return false
+    return true
+  })
+  return applySort(filtered, fishSort)
+})
+
+// Load
+async function loadFish() {
+  loadingFish.value = true
+  errorFish.value   = null
+  try {
+    fish.value = await get_api('/api/shop/fish')
+  } catch {
+    errorFish.value = 'Could not load fish. Please try again.'
+  } finally {
+    loadingFish.value = false
+  }
+}
+
+// Dans buy(), ajouter le cas 'fish' (déjà géré si l'URL est /api/shop/fish/{id}/buy)
+// La fonction buy() existante fonctionne telle quelle grâce au ternaire à adapter :
+// Remplacer la ligne post_api par :
+// `/api/shop/${type === 'food' ? 'food' : type === 'fish' ? 'fish' : 'upgrades'}/${item.id}/buy`
 
 // ── Filters ───────────────────────────────────────────────────────────────────
 
@@ -301,8 +420,8 @@ function showToast(message, type = 'success') {
 
 async function buy(type, item) {
   try {
-    await post_api(`/api/shop/${type === 'food' ? 'food' : 'upgrades'}/${item.id}/buy`, { userId: authStore.pseudo })
-    userCoins.value -= item.price
+    await post_api(`/api/shop/${type === 'food' ? 'food' : type === 'fish' ? 'fish' : 'upgrades'}/${item.id}/buy`, { userId: authStore.pseudo })
+    await loadUserCoins()
     showToast(`${item.name} purchased successfully!`, 'success')
   } catch {
     showToast(`Could not purchase ${item.name}. Please try again.`, 'error')
@@ -348,6 +467,7 @@ async function loadUserCoins() {
 
 onMounted(() => {
   loadFood()
+  loadFish()
   loadUpgrades()
   loadUserCoins()
 })
@@ -638,4 +758,7 @@ td {
   animation: spin 0.7s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+.color-dot-wrap { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; }
+.color-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); flex-shrink: 0; }
 </style>
