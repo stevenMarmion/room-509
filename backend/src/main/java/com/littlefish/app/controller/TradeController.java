@@ -1,5 +1,6 @@
 package com.littlefish.app.controller;
 
+import com.littlefish.app.dto.CreateTradeRequest;
 import com.littlefish.app.dto.TradeDTO;
 import com.littlefish.app.model.Trade;
 import com.littlefish.app.service.TradeService;
@@ -34,8 +35,8 @@ public class TradeController {
     }
 
     @PostMapping
-    public Trade create(@RequestBody Trade trade) {
-        return tradeService.save(trade);
+    public ResponseEntity<TradeDTO> create(@RequestBody CreateTradeRequest request) {
+        return ResponseEntity.status(201).body(tradeService.createTrade(request));
     }
 
     @PutMapping("/{id}")

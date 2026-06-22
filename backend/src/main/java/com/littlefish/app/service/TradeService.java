@@ -1,9 +1,14 @@
 package com.littlefish.app.service;
 
+import com.littlefish.app.dto.CreateTradeRequest;
 import com.littlefish.app.dto.TradeDTO;
+import com.littlefish.app.model.Fish;
 import com.littlefish.app.model.Trade;
+import com.littlefish.app.model.User;
 import com.littlefish.app.model.enums.TradeStatus;
 import com.littlefish.app.repository.TradeRepository;
+import com.littlefish.app.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +21,9 @@ import java.util.Optional;
 public class TradeService {
 
     private final TradeRepository tradeRepository;
+    private final UserRepository userRepository;
     private final UserService userService;
+    private final FishService fishService;
 
     public List<Trade> findAll() {
         return tradeRepository.findAll();
@@ -26,12 +33,27 @@ public class TradeService {
         return tradeRepository.findById(id);
     }
 
-    public Trade save(Trade trade) {
-        trade.setInitiator(userService.findByPseudo(trade.getInitiator().getPseudo()).orElse(null));
-        trade.setReceiver(userService.findById(trade.getReceiver().getId()).orElse(null));
+    public TradeDTO createTrade(CreateTradeRequest request) {
+        Trade trade = new Trade();
+
+        trade.setInitiator(
+            userService.findByPseudo(request.initiatorPseudo()).orElse(null)
+        );
+        trade.setReceiver(
+            userService.findById(request.receiverId()).orElse(null)
+        );
+        trade.setPrice(request.price());
         trade.setStatus(TradeStatus.PENDING);
         trade.setCreatedAt(LocalDateTime.now());
-        return tradeRepository.save(trade);
+
+        List<Fish> fishes = request.fishIds().stream()
+            .map(id -> fishService.findById(id).orElse(null))
+            .filter(f -> f != null)
+            .toList();
+        trade.setFish(fishes);
+
+        Trade saved = tradeRepository.save(trade);
+        return toDTO(saved);
     }
 
     public Optional<Trade> update(Long id, Trade patch) {
@@ -54,30 +76,32 @@ public class TradeService {
 
     public Optional<Trade> acceptTrade(Long id) {
         Trade existingTrade = tradeRepository.findById(id).orElse(null);
-        if (existingTrade != null) {
-            userService.findByPseudo(existingTrade.getInitiator().getPseudo()).ifPresent(user -> {
-                user.setCoins(user.getCoins() + existingTrade.getPrice());
-                user.getAquarium().getFish().removeAll(existingTrade.getFish());
-                userService.update(user.getPseudo(), user);
-            });
-            userService.findByPseudo(existingTrade.getReceiver().getPseudo()).ifPresent(user -> {
-                user.setCoins(user.getCoins() - existingTrade.getPrice());
-                user.getAquarium().getFish().addAll(existingTrade.getFish());
-                userService.update(user.getPseudo(), user);
-            });
-            existingTrade.setStatus(TradeStatus.ACCEPTED);
-            return Optional.of(tradeRepository.save(existingTrade));
-        }
-        return Optional.empty();
+        if (existingTrade == null) return Optional.empty();
+
+        User initiator = userService.findByPseudo(existingTrade.getInitiator().getPseudo()).orElse(null);
+        User receiver  = userService.findByPseudo(existingTrade.getReceiver().getPseudo()).orElse(null);
+
+        if (initiator == null || receiver == null) return Optional.empty();
+
+        List<Fish> tradedFish = existingTrade.getFish();
+
+        initiator.setCoins(initiator.getCoins() + existingTrade.getPrice());
+        initiator.getAquarium().getFish().removeAll(tradedFish);
+        receiver.setCoins(receiver.getCoins() - existingTrade.getPrice());
+        receiver.getAquarium().getFish().addAll(tradedFish);
+
+        userRepository.save(initiator);
+        userRepository.save(receiver);
+
+        existingTrade.setStatus(TradeStatus.ACCEPTED);
+        return Optional.of(tradeRepository.save(existingTrade));
     }
 
     public Optional<Trade> rejectTrade(Long id) {
-        Trade existingTrade = tradeRepository.findById(id).orElse(null);
-        if (existingTrade != null) {
-            existingTrade.setStatus(TradeStatus.REJECTED);
-            return Optional.of(tradeRepository.save(existingTrade));
-        }
-        return Optional.empty();
+        return tradeRepository.findById(id).map(trade -> {
+            trade.setStatus(TradeStatus.REJECTED);
+            return tradeRepository.save(trade);
+        });
     }
     
     public TradeDTO toDTO(Trade trade) {
