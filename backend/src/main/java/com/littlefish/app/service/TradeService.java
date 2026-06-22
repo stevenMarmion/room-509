@@ -88,8 +88,8 @@ public class TradeService {
 
         List<Fish> tradedFish = existingTrade.getFish();
 
-        initiator.setCoins(initiator.getCoins() + existingTrade.getPrice());
-        receiver.setCoins(receiver.getCoins() - existingTrade.getPrice());
+        userRepository.updateCoins(initiator.getPseudo(), initiator.getCoins() + existingTrade.getPrice());
+        userRepository.updateCoins(receiver.getPseudo(),  receiver.getCoins()  - existingTrade.getPrice());
 
         Aquarium receiverAquarium = receiver.getAquarium();
         for (Fish fish : tradedFish) {
@@ -99,9 +99,6 @@ public class TradeService {
 
         initiator.getAquarium().getFish().removeAll(tradedFish);
         receiverAquarium.getFish().addAll(tradedFish);
-
-        userRepository.save(initiator);
-        userRepository.save(receiver);
 
         existingTrade.setStatus(TradeStatus.ACCEPTED);
         return Optional.of(tradeRepository.save(existingTrade));

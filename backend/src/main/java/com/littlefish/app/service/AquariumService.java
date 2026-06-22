@@ -1,7 +1,10 @@
 package com.littlefish.app.service;
 
 import com.littlefish.app.model.Aquarium;
+import com.littlefish.app.model.Fish;
 import com.littlefish.app.repository.AquariumRepository;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -47,15 +50,19 @@ public class AquariumService {
         return update(id, new Aquarium() {{ setPublic(isPublic); }});
     }
 
-    public Optional<Aquarium> addFish(Long id, Aquarium patch) {
-        Aquarium existingAquarium = aquariumRepository.findById(id).orElse(null);
-        if (existingAquarium != null && patch.getFish() != null) {
-            // Avoid duplicates fish in list
-            existingAquarium.getFish().removeIf(fish -> patch.getFish().stream().anyMatch(f -> f.getId() == fish.getId()));
-            existingAquarium.getFish().addAll(patch.getFish()); 
-            return Optional.of(aquariumRepository.save(existingAquarium));
+    @Transactional
+    public Optional<Aquarium> addFishToAquarium(Long aquariumId, Fish fish) {
+        Aquarium aquarium = aquariumRepository.findById(aquariumId).orElse(null);
+        if (aquarium == null) return Optional.empty();
+
+        if (aquarium.getFish().size() >= aquarium.getCapacity()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+
+        fish.setAquarium(aquarium);
+        aquarium.getFish().add(fish);
+
+        return Optional.of(aquariumRepository.save(aquarium));
     }
 
     public void deleteById(Long id) {

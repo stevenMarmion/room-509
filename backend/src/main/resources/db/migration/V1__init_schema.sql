@@ -47,6 +47,7 @@ CREATE TABLE fish (
     id            BIGSERIAL    PRIMARY KEY,
     aquarium_id   BIGINT       NOT NULL REFERENCES aquarium(id) ON DELETE CASCADE,
     name          VARCHAR(100) NOT NULL,
+    price         INT          NOT NULL DEFAULT 10,
     species       VARCHAR(100),
     color         VARCHAR(50),
     size          INT          NOT NULL DEFAULT 1,

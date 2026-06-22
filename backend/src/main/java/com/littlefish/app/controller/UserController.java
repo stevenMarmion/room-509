@@ -1,5 +1,6 @@
 package com.littlefish.app.controller;
 
+import com.littlefish.app.dto.UserUpdateDTO;
 import com.littlefish.app.model.User;
 import com.littlefish.app.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -35,10 +36,10 @@ public class UserController {
     }
 
     @PutMapping("/{pseudo}")
-    public ResponseEntity<User> update(@PathVariable String pseudo, @RequestBody User patch) {
-        return userService.update(pseudo, patch)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<User> update(@PathVariable String pseudo, @RequestBody UserUpdateDTO dto) {
+        return userService.update(pseudo, dto)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{pseudo}")

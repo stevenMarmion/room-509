@@ -46,13 +46,6 @@ public class AquariumController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/{id}/fish")
-    public ResponseEntity<Aquarium> addFish(@PathVariable Long id, @RequestBody Aquarium patch) {
-        return aquariumService.addFish(id, patch)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         aquariumService.deleteById(id);
