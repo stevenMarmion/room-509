@@ -16,6 +16,19 @@
       </div>
     </div>
 
+    <!-- ── Mini Aquarium ── -->
+    <div v-if="fishes.length > 0 && !loading" class="mini-aquarium" ref="miniAquariumRef">
+      <img :src="aquariumBg" class="mini-aquarium-bg" />
+      <FishSprite
+        v-for="fish in fishes.slice(0, 12)"
+        :key="'aq-' + fish.id"
+        :color="fish.color"
+        :lifePoints="fish.lifePoints"
+        :king="kingIds.has(fish.id)"
+        :bounds="aquariumBounds"
+      />
+    </div>
+
     <!-- ── Filters ── -->
     <div class="filters-card">
 
@@ -90,7 +103,19 @@
         </thead>
         <tbody>
           <tr v-for="fish in filteredFishes" :key="fish.id">
-            <td class="td-name">{{ fish.name }}</td>
+            <td class="td-name">
+              <div class="fish-name-cell">
+                <div class="sprite-thumb">
+                  <FishSprite
+                    :color="fish.color"
+                    :lifePoints="fish.lifePoints"
+                    :king="kingIds.has(fish.id)"
+                    :static="true"
+                  />
+                </div>
+                <span>{{ fish.name }}</span>
+              </div>
+            </td>
             <td>{{ fish.species }}</td>
             <td>
               <span class="color-badge" :style="{ background: colorHint(fish.color) }">
@@ -191,11 +216,26 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { get_api, put_api, post_api } from '@/services/api.js'
 import { useAuthStore } from '@/stores/auth.js'
+import FishSprite from '@/components/FishSprite.vue'
+import aquariumBg from '@/assets/far.png'
 
 const authStore = useAuthStore()
+
+// ── Mini aquarium ────────────────────────────────────────────────────────────
+const miniAquariumRef = ref(null)
+const aquariumBounds  = reactive({ width: 0, height: 0 })
+
+async function measureAquarium() {
+  await nextTick()
+  if (miniAquariumRef.value) {
+    const rect = miniAquariumRef.value.getBoundingClientRect()
+    aquariumBounds.width  = rect.width
+    aquariumBounds.height = rect.height
+  }
+}
 
 // ── Sort icon sub-component ───────────────────────────────────────────────────
 
@@ -210,6 +250,18 @@ const SortIcon = {
     ])
   }
 }
+
+// ── King fish (oldest per color) ─────────────────────────────────────────────
+
+const kingIds = computed(() => {
+  const oldest = {}
+  for (const fish of fishes.value) {
+    const c = fish.color?.toLowerCase()
+    if (!c) continue
+    if (!oldest[c] || fish.age > oldest[c].age) oldest[c] = fish
+  }
+  return new Set(Object.values(oldest).map(f => f.id))
+})
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
@@ -411,7 +463,15 @@ async function submitTrade() {
 
 // ── Lifecycle ─────────────────────────────────────────────────────────────────
 
-onMounted(loadFishes)
+onMounted(async () => {
+  await loadFishes()
+  await measureAquarium()
+  window.addEventListener('resize', measureAquarium)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', measureAquarium)
+})
 </script>
 
 <style scoped>
@@ -534,6 +594,38 @@ td {
   padding: 0.85rem 1.2rem;
   color: #1a3a4a;
   vertical-align: middle;
+}
+
+/* ── Mini aquarium ── */
+.mini-aquarium {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+.mini-aquarium-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Sprite in table ── */
+.fish-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.sprite-thumb {
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.sprite-thumb > * {
+  transform: scale(0.5);
+  transform-origin: top left;
 }
 
 .td-name { font-weight: 600; }

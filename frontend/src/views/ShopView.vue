@@ -299,7 +299,7 @@ const SortIcon = {
 // ── State ─────────────────────────────────────────────────────────────────────
 
 const activeTab  = ref('food')
-const userCoins  = ref(0)
+const userCoins  = computed(() => authStore.user?.coins ?? 0)
 
 const food          = ref([])
 const loadingFood   = ref(true)
@@ -421,7 +421,7 @@ function showToast(message, type = 'success') {
 async function buy(type, item) {
   try {
     await post_api(`/api/shop/${type === 'food' ? 'food' : type === 'fish' ? 'fish' : 'upgrades'}/${item.id}/buy`, { userId: authStore.pseudo })
-    await loadUserCoins()
+    await authStore.fetchCurrentUser()
     showToast(`${item.name} purchased successfully!`, 'success')
   } catch {
     showToast(`Could not purchase ${item.name}. Please try again.`, 'error')
@@ -454,14 +454,6 @@ async function loadUpgrades() {
   }
 }
 
-async function loadUserCoins() {
-  try {
-    const user = await get_api(`/api/users/${authStore.pseudo}`)
-    userCoins.value = user.coins
-  } catch {
-    console.warn('Could not load user coins.')
-  }
-}
 
 // ── Lifecycle ─────────────────────────────────────────────────────────────────
 
@@ -469,7 +461,7 @@ onMounted(() => {
   loadFood()
   loadFish()
   loadUpgrades()
-  loadUserCoins()
+  authStore.fetchCurrentUser()
 })
 </script>
 

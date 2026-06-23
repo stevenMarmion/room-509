@@ -280,6 +280,7 @@ async function respond(action) {
     )
     closeTradePopup()
     await loadTrades()
+    await authStore.fetchCurrentUser()
   } catch {
     showToast('Could not process this trade. Please try again.', 'error')
   } finally {

@@ -48,10 +48,9 @@ export const useAuthStore = defineStore('auth', () => {
   async function fetchCurrentUser() {
     if (!pseudo.value) return
     try {
-      const data = await get_api(`/api/auth/me?pseudo=${encodeURIComponent(pseudo.value)}`)
+      const data = await get_api(`/api/users/${encodeURIComponent(pseudo.value)}`)
       user.value = data
     } catch {
-      // Cookie expired or invalid — clear local state
       clearSession()
     }
   }

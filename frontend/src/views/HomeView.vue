@@ -2,21 +2,24 @@
   <main class="home-layout" v-if="authStore.isAuthenticated">
 
     <!-- ── Aquarium ── -->
-    <!-- <template> -->
-      <div class="aquarium-container" ref="aquariumRef">
+      <div class="aquarium-container" ref="aquariumRef" @click="onAquariumClick">
         <img src="@/assets/far.png" class="aquarium-bg" />
 
-        <!-- HomeView.vue — temporaire -->
         <FishSprite
           v-for="fish in fishList"
           :key="'sprite-' + fish.id"
-          color="blue"
+          :color="fish.color"
+          :lifePoints="fish.lifePoints"
+          :king="kingIds.has(fish.id)"
           :bounds="bounds"
         />
 
-        <div class="aquarium-overlay">Click a fish to earn !</div>
+        <Transition name="coin-popup">
+          <div v-if="coinPopup.visible" class="coin-popup" :style="{ left: coinPopup.x + 'px', top: coinPopup.y + 'px' }">
+            +1
+          </div>
+        </Transition>
       </div>
-    <!-- </template> -->
 
     <!-- ── Sidebar ── -->
     <aside class="sidebar">
@@ -118,10 +121,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick, watch } from 'vue'
+import { ref, reactive, computed, onMounted, nextTick, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.js'
-import { get_api } from '@/services/api.js'
+import { get_api, post_api } from '@/services/api.js'
 import FishSprite from '@/components/FishSprite.vue'
 
 const authStore = useAuthStore()
@@ -131,14 +134,48 @@ const aquariumRef = ref(null)
 const bounds      = reactive({ width: 800, height: 500 })
 const fishList    = ref([])
 
+const kingIds = computed(() => {
+  const oldest = {}
+  for (const fish of fishList.value) {
+    const c = fish.color?.toLowerCase()
+    if (!c) continue
+    if (!oldest[c] || fish.age > oldest[c].age) oldest[c] = fish
+  }
+  return new Set(Object.values(oldest).map(f => f.id))
+})
+
 async function loadAquarium() {
   try {
     const user = await get_api(`/api/users/${authStore.pseudo}`)
+    authStore.user = user
     fishList.value = user.aquarium?.fish ?? []
-    console.log('fishList:', fishList.value)       // ← ajoute ça
-    console.log('bounds:', bounds.width, bounds.height) // ← et ça
   } catch (e) {
     console.warn('Could not load aquarium fish', e)
+  }
+}
+
+// ── Click to earn ────────────────────────────────────────────
+const coinPopup = reactive({ visible: false, x: 0, y: 0 })
+let coinPopupTimer = null
+
+async function onAquariumClick(e) {
+  const rect = aquariumRef.value.getBoundingClientRect()
+  coinPopup.x = e.clientX - rect.left
+  coinPopup.y = e.clientY - rect.top
+
+  clearTimeout(coinPopupTimer)
+  coinPopup.visible = true
+  coinPopupTimer = setTimeout(() => { coinPopup.visible = false }, 800)
+
+  try {
+    const updated = await post_api(`/api/users/${authStore.pseudo}/earn`, {})
+    if (authStore.user && updated?.coins != null) {
+      authStore.user.coins = updated.coins
+    } else {
+      await authStore.fetchCurrentUser()
+    }
+  } catch {
+    console.warn('Could not earn coins')
   }
 }
 
@@ -181,36 +218,33 @@ const tradeRequests     = ref('Loading...')
 }
 
 /* ── Aquarium ── */
-.aquarium-footer {
-  background: #c9a227;
-  color: #fff;
-  text-align: center;
-  padding: 0.6rem;
-  font-style: italic;
-  font-size: 0.9rem;
-}
 .aquarium-container {
   position: relative;
   width: 100%;
   height: 500px;
   overflow: hidden;
   border-radius: 12px;
+  cursor: pointer;
 }
 .aquarium-bg {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.aquarium-overlay {
+/* ── Coin popup ── */
+.coin-popup {
   position: absolute;
-  bottom: 0; left: 0; right: 0;
-  background: rgba(180,140,0,0.85);
-  color: #fff;
-  text-align: center;
-  padding: 0.6rem;
-  font-size: 0.9rem;
-  font-weight: 600;
+  pointer-events: none;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #f5c842;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  transform: translateX(-50%);
 }
+.coin-popup-enter-active { transition: opacity 0.15s, transform 0.6s ease-out; }
+.coin-popup-leave-active { transition: opacity 0.4s, transform 0.6s ease-out; }
+.coin-popup-enter-from { opacity: 0; transform: translateX(-50%) translateY(0); }
+.coin-popup-leave-to   { opacity: 0; transform: translateX(-50%) translateY(-30px); }
 
 /* ── Sidebar ── */
 .sidebar {

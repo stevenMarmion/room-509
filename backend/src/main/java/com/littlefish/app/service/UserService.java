@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -105,6 +106,13 @@ public class UserService {
     }
 
     @Transactional
+    public Optional<User> earnCoins(String pseudo, int amount) {
+        User user = userRepository.findByPseudo(pseudo).orElse(null);
+        if (user == null) return Optional.empty();
+        user.setCoins(user.getCoins() + amount);
+        return Optional.of(userRepository.save(user));
+    }
+
     public void deleteByPseudo(String pseudo) {
         userRepository.deleteByPseudo(pseudo);
     }
