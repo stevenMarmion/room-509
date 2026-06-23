@@ -1,5 +1,7 @@
 package com.littlefish.app.controller;
 
+import com.littlefish.app.dto.UpdateCoinsRequest;
+import com.littlefish.app.dto.UpdateRoleRequest;
 import com.littlefish.app.dto.UserUpdateDTO;
 import com.littlefish.app.model.User;
 import com.littlefish.app.service.UserService;
@@ -53,5 +55,19 @@ public class UserController {
     public ResponseEntity<Void> delete(@PathVariable String pseudo) {
         userService.deleteByPseudo(pseudo);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{pseudo}/role")
+    public ResponseEntity<User> updateRole(@PathVariable String pseudo, @RequestBody UpdateRoleRequest request) {
+        return userService.updateRole(pseudo, request.role())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PatchMapping("/{pseudo}/coins")
+    public ResponseEntity<User> updateCoins(@PathVariable String pseudo, @RequestBody UpdateCoinsRequest request) {
+        return userService.updateCoinsAdmin(pseudo, request.coins())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

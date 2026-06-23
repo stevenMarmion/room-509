@@ -35,10 +35,10 @@ public class AquariumService {
             existingAquarium.setName(patch.getName());
         }
         if (patch.getLevel() != 0) {
-            existingAquarium.setLevel(existingAquarium.getLevel() + patch.getLevel());
+            existingAquarium.setLevel(patch.getLevel());
         }
         if (patch.getCapacity() != 0) {
-            existingAquarium.setCapacity(existingAquarium.getCapacity() + patch.getCapacity());
+            existingAquarium.setCapacity(patch.getCapacity());
         }
         if (patch.isPublic() != existingAquarium.isPublic()) {
             existingAquarium.setPublic(patch.isPublic());

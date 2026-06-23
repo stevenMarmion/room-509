@@ -9,6 +9,7 @@ import com.littlefish.app.model.enums.Role;
 import com.littlefish.app.model.enums.Theme;
 import com.littlefish.app.repository.FishRepository;
 import com.littlefish.app.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -86,19 +87,20 @@ public class UserService {
 
         user.setFriendships(List.of());
         user.setTrades(List.of());
-        user.setDailyChallenges(dailyChallengeService.findRandom(3));
-
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        dailyChallengeService.assignDailyChallengesToUser(savedUser);
+        
+        return savedUser;
     }
 
     public Optional<User> update(String pseudo, UserUpdateDTO dto) {
         User user = userRepository.findByPseudo(pseudo).orElse(null);
         if (user == null) return Optional.empty();
 
-        if (dto.getPseudo()  != null) user.setPseudo(dto.getPseudo());
-        if (dto.getEmail()   != null) user.setEmail(dto.getEmail());
-        if (dto.getAvatar()  != null) user.setAvatar(dto.getAvatar());
-        if (dto.getTheme()   != null) user.setTheme(dto.getTheme());
+        if (dto.pseudo()  != null) user.setPseudo(dto.pseudo());
+        if (dto.email()   != null) user.setEmail(dto.email());
+        if (dto.avatar()  != null) user.setAvatar(dto.avatar());
+        if (dto.theme()   != null) user.setTheme(dto.theme());
 
         return Optional.of(userRepository.save(user));
     }
@@ -113,5 +115,22 @@ public class UserService {
 
     public void deleteByPseudo(String pseudo) {
         userRepository.deleteByPseudo(pseudo);
+    }
+
+    @Transactional
+    public Optional<User> updateRole(String pseudo, Role role) {
+        User user = userRepository.findByPseudo(pseudo).orElse(null);
+        if (user == null) return Optional.empty();
+
+        user.setRole(role);
+        return Optional.of(userRepository.save(user));
+    }
+
+    @Transactional
+    public Optional<User> updateCoinsAdmin(String pseudo, int coins) {
+        if (userRepository.findByPseudo(pseudo).isEmpty()) return Optional.empty();
+
+        userRepository.updateCoins(pseudo, coins);
+        return userRepository.findByPseudo(pseudo);
     }
 }
