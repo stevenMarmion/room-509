@@ -25,10 +25,21 @@ public class FishController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping
+    public Fish create(@RequestBody Fish fish) {
+        return fishService.save(fish);
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<Fish> updateName(@PathVariable Long id, @RequestBody String fishName) {
-        return fishService.updateName(id, fishName)
+    public ResponseEntity<Fish> update(@PathVariable Long id, @RequestBody Fish patch) {
+        return fishService.update(id, patch)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        fishService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

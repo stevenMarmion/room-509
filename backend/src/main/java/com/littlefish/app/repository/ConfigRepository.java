@@ -8,4 +8,5 @@ import java.util.Optional;
 @Repository
 public interface ConfigRepository extends JpaRepository<Config, Long> {
     public Optional<Config> findByKey(String key);
+    public void deleteByKey(String key);
 }

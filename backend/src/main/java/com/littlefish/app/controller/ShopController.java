@@ -68,4 +68,58 @@ public class ShopController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.badRequest().build());
     }
+
+    @PostMapping("/food")
+    public Food createFood(@RequestBody Food food) {
+        return shopService.createFood(food);
+    }
+
+    @PutMapping("/food/{id}")
+    public ResponseEntity<Food> updateFood(@PathVariable Long id, @RequestBody Food patch) {
+        return shopService.updateFood(id, patch)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/food/{id}")
+    public ResponseEntity<Void> deleteFood(@PathVariable Long id) {
+        shopService.deleteFood(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/upgrades")
+    public AquariumUpgrade createUpgrade(@RequestBody AquariumUpgrade upgrade) {
+        return shopService.createUpgrade(upgrade);
+    }
+
+    @PutMapping("/upgrades/{id}")
+    public ResponseEntity<AquariumUpgrade> updateUpgrade(@PathVariable Long id, @RequestBody AquariumUpgrade patch) {
+        return shopService.updateUpgrade(id, patch)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/upgrades/{id}")
+    public ResponseEntity<Void> deleteUpgrade(@PathVariable Long id) {
+        shopService.deleteUpgrade(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/fish")
+    public Fish createShopFish(@RequestBody Fish fish) {
+        return shopService.createShopFish(fish);
+    }
+
+    @PutMapping("/fish/{id}")
+    public ResponseEntity<Fish> updateShopFish(@PathVariable Long id, @RequestBody Fish patch) {
+        return shopService.updateShopFish(id, patch)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/fish/{id}")
+    public ResponseEntity<Void> deleteShopFish(@PathVariable Long id) {
+        shopService.deleteShopFish(id);
+        return ResponseEntity.noContent().build();
+    }
 }
