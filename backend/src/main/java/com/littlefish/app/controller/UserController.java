@@ -42,6 +42,13 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/{pseudo}/earn")
+    public ResponseEntity<User> earnCoins(@PathVariable String pseudo) {
+        return userService.earnCoins(pseudo, 1)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/{pseudo}")
     public ResponseEntity<Void> delete(@PathVariable String pseudo) {
         userService.deleteByPseudo(pseudo);

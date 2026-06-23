@@ -190,8 +190,8 @@ function showToast(message, type = 'success') {
 
 async function loadProfile() {
   try {
-    // Replace 1 with the actual logged-in user id
     const data = await get_api(`/api/users/${authStore.pseudo}`)
+    authStore.user = data
     Object.assign(user, data)
     resetForm()
     isDark.value = data.theme === 'DARK'
