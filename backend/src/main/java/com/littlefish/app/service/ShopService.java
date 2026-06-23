@@ -131,4 +131,75 @@ public class ShopService {
 
         return aquariumService.addFishToAquarium(aquarium.getId(), newFish);
     }
+
+    @Transactional
+    public Food createFood(Food food) {
+        return foodRepository.save(food);
+    }
+
+    @Transactional
+    public Optional<Food> updateFood(Long id, Food patch) {
+        Food existing = foodRepository.findById(id).orElse(null);
+        if (existing == null) return Optional.empty();
+
+        if (patch.getName() != null) existing.setName(patch.getName());
+        if (patch.getPrice() != 0) existing.setPrice(patch.getPrice());
+        if (patch.getNutritionValue() != 0) existing.setNutritionValue(patch.getNutritionValue());
+
+        return Optional.of(foodRepository.save(existing));
+    }
+
+    @Transactional
+    public void deleteFood(Long id) {
+        foodRepository.deleteById(id);
+    }
+
+    @Transactional
+    public AquariumUpgrade createUpgrade(AquariumUpgrade upgrade) {
+        return upgradeRepository.save(upgrade);
+    }
+
+    @Transactional
+    public Optional<AquariumUpgrade> updateUpgrade(Long id, AquariumUpgrade patch) {
+        AquariumUpgrade existing = upgradeRepository.findById(id).orElse(null);
+        if (existing == null) return Optional.empty();
+
+        if (patch.getName() != null) existing.setName(patch.getName());
+        if (patch.getPrice() != 0) existing.setPrice(patch.getPrice());
+        if (patch.getCapacityBonus() != 0) existing.setCapacityBonus(patch.getCapacityBonus());
+        if (patch.getLevelBonus() != 0) existing.setLevelBonus(patch.getLevelBonus());
+
+        return Optional.of(upgradeRepository.save(existing));
+    }
+
+    @Transactional
+    public void deleteUpgrade(Long id) {
+        upgradeRepository.deleteById(id);
+    }
+
+    @Transactional
+    public Fish createShopFish(Fish fish) {
+        return fishRepository.save(fish);
+    }
+
+    @Transactional
+    public Optional<Fish> updateShopFish(Long id, Fish patch) {
+        Fish existing = fishRepository.findById(id).orElse(null);
+        if (existing == null) return Optional.empty();
+
+        if (patch.getName() != null) existing.setName(patch.getName());
+        if (patch.getSpecies() != null) existing.setSpecies(patch.getSpecies());
+        if (patch.getColor() != null) existing.setColor(patch.getColor());
+        if (patch.getPrice() != 0) existing.setPrice(patch.getPrice());
+        if (patch.getSize() != 0) existing.setSize(patch.getSize());
+        if (patch.getAge() != 0) existing.setAge(patch.getAge());
+        if (patch.getLifePoints() != 0) existing.setLifePoints(patch.getLifePoints());
+
+        return Optional.of(fishRepository.save(existing));
+    }
+
+    @Transactional
+    public void deleteShopFish(Long id) {
+        fishRepository.deleteById(id);
+    }
 }

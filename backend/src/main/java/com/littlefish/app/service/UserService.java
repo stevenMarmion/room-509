@@ -9,6 +9,7 @@ import com.littlefish.app.model.enums.Role;
 import com.littlefish.app.model.enums.Theme;
 import com.littlefish.app.repository.FishRepository;
 import com.littlefish.app.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -113,5 +114,22 @@ public class UserService {
 
     public void deleteByPseudo(String pseudo) {
         userRepository.deleteByPseudo(pseudo);
+    }
+
+    @Transactional
+    public Optional<User> updateRole(String pseudo, Role role) {
+        User user = userRepository.findByPseudo(pseudo).orElse(null);
+        if (user == null) return Optional.empty();
+
+        user.setRole(role);
+        return Optional.of(userRepository.save(user));
+    }
+
+    @Transactional
+    public Optional<User> updateCoinsAdmin(String pseudo, int coins) {
+        if (userRepository.findByPseudo(pseudo).isEmpty()) return Optional.empty();
+
+        userRepository.updateCoins(pseudo, coins);
+        return userRepository.findByPseudo(pseudo);
     }
 }

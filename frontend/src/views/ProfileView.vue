@@ -102,6 +102,18 @@
       </div>
     </div>
 
+      <!-- ── Admin panel ── -->
+    <div v-if="authStore.role === 'ADMIN'" class="pcard pcard--admin">
+      <div class="section-title section-title--admin">Administration</div>
+      <div class="danger-row">
+        <div>
+          <div class="danger-label">Admin panel</div>
+          <div class="danger-hint">Manage users, fish, shop, trades and app config.</div>
+        </div>
+        <RouterLink to="/admin" class="btn-admin">Open panel</RouterLink>
+      </div>
+    </div>
+
   </main>
 
   <!-- ── Password modal ── -->
@@ -135,6 +147,7 @@ import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { get_api, put_api } from '@/services/api.js'
 import { useAuthStore } from '@/stores/auth.js'
 import { useRouter } from 'vue-router'
+import { RouterLink } from 'vue-router'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -195,6 +208,7 @@ async function loadProfile() {
     Object.assign(user, data)
     resetForm()
     isDark.value = data.theme === 'DARK'
+    authStore.role = data.role
   } catch {
     console.warn('Could not load profile.')
   }
@@ -286,6 +300,23 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.pcard--admin  { border: 1.5px solid #e8f7f7; }
+.section-title--admin { color: #0d7377; }
+.btn-admin {
+  background: #0d2137;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+.btn-admin:hover { opacity: 0.85; }
+
 /* ── Layout ── */
 .profile-layout {
   max-width: 760px;

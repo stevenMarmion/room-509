@@ -11,6 +11,8 @@ export const useAuthStore = defineStore('auth', () => {
 
   const pseudo = ref(sessionStorage.getItem('pseudo') || null)
   const user   = ref(null)
+  const role = ref(sessionStorage.getItem('role') || null)
+  const isAdmin = computed(() => role.value === 'ADMIN')
 
   const isAuthenticated = computed(() => !!pseudo.value)
 
@@ -56,13 +58,17 @@ export const useAuthStore = defineStore('auth', () => {
   function setSession(data) {
     user.value   = data
     pseudo.value = data.pseudo
+    role.value = data.role
     sessionStorage.setItem('pseudo', data.pseudo)
+    sessionStorage.setItem('role', data.role)
   }
 
   function clearSession() {
     user.value   = null
     pseudo.value = null
+    role.value = null
     sessionStorage.removeItem('pseudo')
+    sessionStorage.removeItem('role')
   }
 
   return {
@@ -73,5 +79,7 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     logout,
     fetchCurrentUser,
+    role,
+    isAdmin
   }
 })

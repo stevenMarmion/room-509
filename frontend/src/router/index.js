@@ -12,6 +12,16 @@ import SearchResultsView from '@/views/SearchResultsView.vue'
 import UserProfileView   from '@/views/UserProfileView.vue'
 import AquariumView from '@/views/AquariumView.vue'
 import TradeView from '@/views/TradeView.vue'
+import AdminLayout from '@/views/admin/AdminLayout.vue'
+import AdminUsers from '@/views/admin/AdminUsers.vue'
+import AdminFish from '@/views/admin/AdminFish.vue'
+import AdminAquariums from '@/views/admin/AdminAquariums.vue'
+import AdminShop from '@/views/admin/AdminShop.vue'
+import AdminTrades from '@/views/admin/AdminTrades.vue'
+import AdminChallenges from '@/views/admin/AdminChallenges.vue'
+import AdminFriendships from '@/views/admin/AdminFriendships.vue'
+import AdminNotifications from '@/views/admin/AdminNotifications.vue'
+import AdminConfig from '@/views/admin/AdminConfig.vue'
 
 
 const router = createRouter({
@@ -29,6 +39,18 @@ const router = createRouter({
     { path: '/trade',             component: TradeView,            meta: { requiresAuth: true } },
     { path: '/search',            component: SearchResultsView },
     { path: '/users/:pseudo',     component: UserProfileView },
+    { path: '/admin',             component: AdminLayout,          meta: { requiresAdmin: true },  children: [
+      { path: '',             redirect: '/admin/users' },
+      { path: 'users',        component: AdminUsers },
+      { path: 'aquariums',    component: AdminAquariums },
+      { path: 'fish',         component: AdminFish },
+      { path: 'shop',         component: AdminShop },
+      { path: 'trades',       component: AdminTrades },
+      { path: 'challenges',   component: AdminChallenges },
+      { path: 'friendships',  component: AdminFriendships },
+      { path: 'notifications',component: AdminNotifications },
+      { path: 'config',       component: AdminConfig },
+    ]},
   ],
 })
 

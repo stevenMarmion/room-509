@@ -123,7 +123,15 @@ public class FriendshipService {
 
         return Optional.of(user);
     }
-    
+
+    public List<Friendship> findAll() {
+        return friendshipRepository.findAll();
+    }
+
+    public void deleteById(Long id) {
+        friendshipRepository.deleteById(id);
+    }
+
     public FriendshipDTO toDTO(Friendship f, String requesterPseudo) {
         User friend = f.getRequester().getPseudo().equals(requesterPseudo) ? f.getAddressee(): f.getRequester();
 
