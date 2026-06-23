@@ -2,10 +2,21 @@
   <main class="home-layout" v-if="authStore.isAuthenticated">
 
     <!-- ── Aquarium ── -->
-    <section class="aquarium-container">
-      <img class="aquarium-bg" src="@/assets/far.png" alt="Aquarium" />
-      <div class="aquarium-footer">Click a fish to earn !</div>
-    </section>
+    <!-- <template> -->
+      <div class="aquarium-container" ref="aquariumRef">
+        <img src="@/assets/far.png" class="aquarium-bg" />
+
+        <!-- HomeView.vue — temporaire -->
+        <FishSprite
+          v-for="fish in fishList"
+          :key="'sprite-' + fish.id"
+          color="blue"
+          :bounds="bounds"
+        />
+
+        <div class="aquarium-overlay">Click a fish to earn !</div>
+      </div>
+    <!-- </template> -->
 
     <!-- ── Sidebar ── -->
     <aside class="sidebar">
@@ -107,19 +118,56 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted, nextTick, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.js'
+import { get_api } from '@/services/api.js'
+import FishSprite from '@/components/FishSprite.vue'
 
 const authStore = useAuthStore()
-const challengesSummary = ref('Loading...')
-const tradeRequests     = ref('Loading...')
+
+// ── Aquarium ──────────────────────────────────────────────────
+const aquariumRef = ref(null)
+const bounds      = reactive({ width: 800, height: 500 })
+const fishList    = ref([])
+
+async function loadAquarium() {
+  try {
+    const user = await get_api(`/api/users/${authStore.pseudo}`)
+    fishList.value = user.aquarium?.fish ?? []
+    console.log('fishList:', fishList.value)       // ← ajoute ça
+    console.log('bounds:', bounds.width, bounds.height) // ← et ça
+  } catch (e) {
+    console.warn('Could not load aquarium fish', e)
+  }
+}
+
+async function measureBounds() {
+  await nextTick()
+  if (aquariumRef.value) {
+    const rect    = aquariumRef.value.getBoundingClientRect()
+    bounds.width  = rect.width
+    bounds.height = rect.height
+  }
+}
 
 onMounted(async () => {
-  // Replace with real API calls when endpoints are ready
-  challengesSummary.value = 'To complete with real datas'
-  tradeRequests.value     = 'To complete with real datas'
+  if (authStore.isAuthenticated) {
+    await loadAquarium()
+    await measureBounds()
+  }
 })
+
+// Si l'auth arrive après le montage (token chargé de manière asynchrone)
+watch(() => authStore.isAuthenticated, async (val) => {
+  if (val) {
+    await loadAquarium()
+    await measureBounds()
+  }
+})
+
+const challengesSummary = ref('Loading...')
+const tradeRequests     = ref('Loading...')
 </script>
 
 <style scoped>
@@ -133,20 +181,6 @@ onMounted(async () => {
 }
 
 /* ── Aquarium ── */
-.aquarium-container {
-  overflow: hidden;
-  border-radius: 8px;
-  position: relative;
-  background: #b2e4e8;
-}
-
-.aquarium-bg {
-  width: 100%;
-  height: 80vh;
-  object-fit: cover;
-  display: block;
-}
-
 .aquarium-footer {
   background: #c9a227;
   color: #fff;
@@ -154,6 +188,28 @@ onMounted(async () => {
   padding: 0.6rem;
   font-style: italic;
   font-size: 0.9rem;
+}
+.aquarium-container {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+.aquarium-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.aquarium-overlay {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(180,140,0,0.85);
+  color: #fff;
+  text-align: center;
+  padding: 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 /* ── Sidebar ── */
