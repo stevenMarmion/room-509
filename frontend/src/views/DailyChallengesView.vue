@@ -1,62 +1,60 @@
 <template>
   <main class="challenges-layout">
 
-    <!-- ── Header ── -->
     <div class="challenges-header">
       <div>
         <h1>Daily challenges</h1>
         <p class="challenges-date">{{ todayLabel }}</p>
       </div>
       <div class="challenges-summary">
-        <span class="summary-count">{{ completedCount }}/{{ challenges.length }}</span>
+        <span class="summary-count">{{ completedCount }}/{{ entries.length }}</span>
         <span class="summary-label">completed</span>
         <span class="summary-coins">+{{ earnedCoins }} coins</span>
       </div>
     </div>
 
-    <!-- ── Progress bar ── -->
     <div class="progress-track">
       <div class="progress-fill" :style="{ width: progressPercent + '%' }"></div>
     </div>
 
-    <!-- ── Loading ── -->
     <div v-if="loading" class="state-box">
       <div class="spinner"></div>
       <p>Loading challenges...</p>
     </div>
 
-    <!-- ── Error ── -->
     <div v-else-if="error" class="state-box state-box--error">
       <p>{{ error }}</p>
       <button class="btn-ghost" @click="loadChallenges">Try again</button>
     </div>
 
-    <!-- ── Challenge cards ── -->
+    <div v-else-if="entries.length === 0" class="state-box">
+      <p>No challenges assigned for today.</p>
+    </div>
+
     <div v-else class="challenges-grid">
       <div
-        v-for="challenge in challenges"
-        :key="challenge.id"
+        v-for="entry in entries"
+        :key="entry.dailyChallenge.id"
         class="challenge-card"
-        :class="{ 'challenge-card--done': challenge.completed }"
+        :class="{ 'challenge-card--done': entry.completed }"
+        @click="completeChallenge(entry)"
+        :style="{ cursor: entry.completed ? 'default' : 'pointer' }"
       >
-        <!-- Checkmark -->
-        <div class="challenge-check" :class="{ 'challenge-check--done': challenge.completed }">
-          <svg v-if="challenge.completed" viewBox="0 0 24 24" fill="#fff" width="18" height="18">
+        <div class="challenge-check" :class="{ 'challenge-check--done': entry.completed }">
+          <svg v-if="entry.completed" viewBox="0 0 24 24" fill="#fff" width="18" height="18">
             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
           </svg>
         </div>
 
-        <!-- Content -->
         <div class="challenge-content">
-          <strong class="challenge-name">{{ challenge.name }}</strong>
-          <span class="challenge-description">{{ challenge.description }}</span>
-          <span class="challenge-date">{{ formatDate(challenge.date) }}</span>
+          <strong class="challenge-name">{{ entry.dailyChallenge.name }}</strong>
+          <span class="challenge-description">{{ entry.dailyChallenge.description }}</span>
+          <span class="challenge-date">{{ formatDate(entry.date) }}</span>
         </div>
 
-        <!-- Reward -->
-        <div class="challenge-reward" :class="{ 'challenge-reward--done': challenge.completed }">
+        <div class="challenge-reward" :class="{ 'challenge-reward--done': entry.completed }">
           <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
-          +{{ challenge.reward }}
+          +{{ entry.dailyChallenge.reward }}
         </div>
       </div>
     </div>
@@ -66,30 +64,27 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { get_api } from '@/services/api.js'
+import { get_api, post_api } from '@/services/api.js'
+import { useAuthStore } from '@/stores/auth.js'
+
+const authStore = useAuthStore()
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
-const challenges = ref([])
-const loading    = ref(true)
-const error      = ref(null)
+const entries = ref([])   // List<DailyChallengeUser>
+const loading = ref(true)
+const error   = ref(null)
 
 // ── Computed ──────────────────────────────────────────────────────────────────
 
-const completedCount = computed(() =>
-  challenges.value.filter(c => c.completed).length
-)
+const completedCount = computed(() => entries.value.filter(e => e.completed).length)
 
 const earnedCoins = computed(() =>
-  challenges.value
-    .filter(c => c.completed)
-    .reduce((sum, c) => sum + c.reward, 0)
+  entries.value.filter(e => e.completed).reduce((sum, e) => sum + e.dailyChallenge.reward, 0)
 )
 
 const progressPercent = computed(() =>
-  challenges.value.length
-    ? (completedCount.value / challenges.value.length) * 100
-    : 0
+  entries.value.length ? (completedCount.value / entries.value.length) * 100 : 0
 )
 
 const todayLabel = computed(() =>
@@ -109,11 +104,32 @@ async function loadChallenges() {
   loading.value = true
   error.value   = null
   try {
-    challenges.value = await get_api('/api/challenges/random')
+    // Récupère les entrées DailyChallengeUser de l'utilisateur connecté
+    const user = await get_api(`/api/users/${authStore.pseudo}`)
+    entries.value = await get_api(`/api/challenges/user/${user.id}`)
   } catch {
     error.value = 'Could not load challenges. Please try again.'
   } finally {
     loading.value = false
+  }
+}
+
+// ── Complete ──────────────────────────────────────────────────────────────────
+
+async function completeChallenge(entry) {
+  if (entry.completed) return
+  try {
+    const user = await get_api(`/api/users/${authStore.pseudo}`)
+    const updated = await post_api(
+      `/api/challenges/${entry.dailyChallenge.id}/complete/${user.id}`, {}
+    )
+    // Mettre à jour localement sans recharger
+    const idx = entries.value.findIndex(
+      e => e.dailyChallenge.id === entry.dailyChallenge.id
+    )
+    if (idx !== -1) entries.value[idx] = updated
+  } catch {
+    console.warn('Could not complete challenge.')
   }
 }
 

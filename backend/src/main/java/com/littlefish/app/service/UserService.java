@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -87,19 +86,20 @@ public class UserService {
 
         user.setFriendships(List.of());
         user.setTrades(List.of());
-        user.setDailyChallenges(dailyChallengeService.findRandom(3));
-
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        dailyChallengeService.assignDailyChallengesToUser(savedUser);
+        
+        return savedUser;
     }
 
     public Optional<User> update(String pseudo, UserUpdateDTO dto) {
         User user = userRepository.findByPseudo(pseudo).orElse(null);
         if (user == null) return Optional.empty();
 
-        if (dto.getPseudo()  != null) user.setPseudo(dto.getPseudo());
-        if (dto.getEmail()   != null) user.setEmail(dto.getEmail());
-        if (dto.getAvatar()  != null) user.setAvatar(dto.getAvatar());
-        if (dto.getTheme()   != null) user.setTheme(dto.getTheme());
+        if (dto.pseudo()  != null) user.setPseudo(dto.pseudo());
+        if (dto.email()   != null) user.setEmail(dto.email());
+        if (dto.avatar()  != null) user.setAvatar(dto.avatar());
+        if (dto.theme()   != null) user.setTheme(dto.theme());
 
         return Optional.of(userRepository.save(user));
     }

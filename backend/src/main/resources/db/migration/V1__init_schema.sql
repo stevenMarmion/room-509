@@ -94,12 +94,20 @@ CREATE TABLE trade_fish (
 -- ------------------------------------------------------------
 CREATE TABLE daily_challenge (
     id        BIGSERIAL    PRIMARY KEY,
-    user_id   BIGINT       NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name      VARCHAR(100) NOT NULL,
     reward    INT          NOT NULL DEFAULT 0,
-    date      DATE         NOT NULL DEFAULT CURRENT_DATE,
-    completed BOOLEAN      NOT NULL DEFAULT FALSE,
     description TEXT       NOT NULL
+);
+
+-- ------------------------------------------------------------
+--  daily_challenge_user  (join table DailyChallenge <-> User)
+-- ------------------------------------------------------------
+CREATE TABLE daily_challenge_user (
+    daily_challenge_id BIGINT NOT NULL REFERENCES daily_challenge(id) ON DELETE CASCADE,
+    user_id            BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    completed          BOOLEAN NOT NULL DEFAULT FALSE,
+    date               DATE NOT NULL DEFAULT CURRENT_DATE,
+    PRIMARY KEY (daily_challenge_id, user_id)
 );
 
 -- ------------------------------------------------------------
@@ -121,16 +129,6 @@ CREATE TABLE aquarium_upgrade (
     price            INT          NOT NULL DEFAULT 0,
     capacity_bonus   INT          NOT NULL DEFAULT 0,
     level_bonus      INT          NOT NULL DEFAULT 0
-);
-
--- ------------------------------------------------------------
---  config  (key-value store for application settings)
--- ------------------------------------------------------------
-CREATE TABLE config (
-    id          BIGSERIAL    PRIMARY KEY,
-    key         VARCHAR(100) NOT NULL UNIQUE,
-    value       VARCHAR(255) NOT NULL,
-    description TEXT
 );
 
 
@@ -170,11 +168,17 @@ INSERT INTO trade (initiator_id, receiver_id, status, price) VALUES
 INSERT INTO trade_fish (trade_id, fish_id) VALUES
     (1, 2);
 
-INSERT INTO daily_challenge (user_id, name, reward, date, completed, description) VALUES
-    (1, 'Feed all fish',           20, CURRENT_DATE, FALSE, 'Feed all the fish in your aquarium'),
-    (1, 'Visit a friend aquarium', 10, CURRENT_DATE, FALSE, 'Visit a friend''s aquarium'),
-    (2, 'Feed all fish',           20, CURRENT_DATE, TRUE, 'Feed all the fish in your aquarium'),
-    (3, 'Level up your aquarium',  30, CURRENT_DATE, FALSE, 'Upgrade your aquarium to the next level');
+INSERT INTO daily_challenge (id, name, reward, description) VALUES
+    (1, 'Feed all fish',           20, 'Feed all the fish in your aquarium'),
+    (2, 'Visit a friend aquarium', 10, 'Visit a friend''s aquarium'),
+    (3, 'Feed all fish',           20, 'Feed all the fish in your aquarium'),
+    (4, 'Level up your aquarium',  30, 'Upgrade your aquarium to the next level');
+
+INSERT INTO daily_challenge_user (daily_challenge_id, user_id, completed, date) VALUES
+    (1, 1, TRUE,  CURRENT_DATE),
+    (2, 1, FALSE, CURRENT_DATE),
+    (3, 2, TRUE,  CURRENT_DATE),
+    (4, 2, FALSE, CURRENT_DATE);
 
 INSERT INTO food (name, price, nutrition_value) VALUES
     ('Basic Pellets',  10, 10),
@@ -185,8 +189,3 @@ INSERT INTO aquarium_upgrade (name, price, capacity_bonus, level_bonus) VALUES
     ('Small Extension', 100, 5, 0),
     ('Level Up Kit',    200, 0, 1),
     ('Deluxe Bundle',   400, 5, 1);
-
-INSERT INTO config (id, key, value, description) VALUES
-    (1, 'secret',                 'ThisIsASecretValue', 'A secret value for testing purposes'),
-    (2, 'daily_challenge_reward', '20',                 'Default reward for completing a daily challenge'),
-    (3, 'max_aquarium_level',     '10',                 'Maximum level an aquarium can reach');

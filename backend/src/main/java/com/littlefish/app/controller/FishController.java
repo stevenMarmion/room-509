@@ -1,5 +1,7 @@
 package com.littlefish.app.controller;
 
+import com.littlefish.app.dto.FishCreateDTO;
+import com.littlefish.app.dto.FishUpdateDTO;
 import com.littlefish.app.model.Fish;
 import com.littlefish.app.service.FishService;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +28,14 @@ public class FishController {
     }
 
     @PostMapping
-    public Fish create(@RequestBody Fish fish) {
-        return fishService.save(fish);
+    public ResponseEntity<Fish> create(@RequestBody FishCreateDTO dto) {
+        return fishService.create(dto)
+                .map(f -> ResponseEntity.status(201).body(f))
+                .orElse(ResponseEntity.badRequest().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Fish> update(@PathVariable Long id, @RequestBody Fish patch) {
+    public ResponseEntity<Fish> update(@PathVariable Long id, @RequestBody FishUpdateDTO patch) {
         return fishService.update(id, patch)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

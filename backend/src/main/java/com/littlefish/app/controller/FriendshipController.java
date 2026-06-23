@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.littlefish.app.dto.FriendshipDTO;
+import com.littlefish.app.dto.FriendshipRequestDTO;
 import com.littlefish.app.model.Friendship;
 import com.littlefish.app.service.FriendshipService;
 
@@ -25,8 +26,18 @@ public class FriendshipController {
     private final FriendshipService friendshipService;
 
     @GetMapping
-    public ResponseEntity<List<Friendship>> getAll() {
-        return ResponseEntity.ok(friendshipService.findAll());
+    public ResponseEntity<List<FriendshipRequestDTO>> getAll() {
+        List<Friendship> friendships = friendshipService.findAll();
+        List<FriendshipRequestDTO> friendshipRequestDTOs = friendships.stream()
+            .map(f -> new FriendshipRequestDTO(
+                f.getId(),
+                f.getStatus().name(),
+                f.getSince(),
+                f.getRequester().getPseudo(),
+                f.getAddressee().getPseudo()
+            ))
+            .toList();
+        return ResponseEntity.ok(friendshipRequestDTOs);
     }
 
     @GetMapping("/{pseudo}/friends")
@@ -62,8 +73,8 @@ public class FriendshipController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        friendshipService.deleteById(id);
-        return ResponseEntity.noContent().build();
+        friendshipService.deleteFriendship(id);
+        return ResponseEntity.noContent().build(); 
     }
 
 }

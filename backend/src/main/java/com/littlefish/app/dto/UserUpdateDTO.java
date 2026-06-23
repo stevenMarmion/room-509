@@ -1,12 +1,10 @@
 package com.littlefish.app.dto;
 
 import com.littlefish.app.model.enums.Theme;
-import lombok.Data;
 
-@Data
-public class UserUpdateDTO {
-    private String pseudo;
-    private String email;
-    private String avatar;
-    private Theme  theme;
-}
+public record UserUpdateDTO(
+    String pseudo,
+    String email,
+    String avatar,
+    Theme  theme
+) {}

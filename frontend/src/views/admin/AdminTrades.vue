@@ -3,21 +3,21 @@
   <div class="admin-section">
     <AdminToast :toast="toast" />
     <div class="admin-toolbar">
-      <input v-model="search" class="admin-search" placeholder="Search by initiator or receiver…" />
+      <input v-model="search" class="admin-search" placeholder="Search by ID or status…" />
     </div>
     <div v-if="loading" class="admin-state">Loading…</div>
     <div v-else class="admin-table-wrap">
       <table class="admin-table">
-        <thead><tr><th>ID</th><th>Initiator</th><th>Receiver</th><th>Price</th><th>Status</th><th>Fish</th><th>Created</th><th>Actions</th></tr></thead>
+        <thead>
+          <tr>
+            <th>ID</th><th>Price</th><th>Status</th><th>Fish</th><th>Created</th><th>Actions</th>
+          </tr>
+        </thead>
         <tbody>
           <tr v-for="t in filtered" :key="t.id">
             <td class="td-muted">{{ t.id }}</td>
-            <td class="td-bold">{{ t.initiator?.pseudo ?? t.initiatorId ?? '—' }}</td>
-            <td>{{ t.receiver?.pseudo ?? t.receiverId ?? '—' }}</td>
             <td><span class="badge badge--gold">{{ t.price }}</span></td>
-            <td>
-              <span class="badge" :class="statusClass(t.status)">{{ t.status }}</span>
-            </td>
+            <td><span class="badge" :class="statusClass(t.status)">{{ t.status }}</span></td>
             <td>{{ t.fish?.length ?? 0 }} fish</td>
             <td class="td-muted">{{ t.createdAt ? new Date(t.createdAt).toLocaleDateString() : '—' }}</td>
             <td class="td-actions">
@@ -45,9 +45,10 @@ function showToast(msg, type = 'success') {
 }
 const filtered = computed(() => {
   const q = search.value.toLowerCase()
+  if (!q) return items.value
   return items.value.filter(t =>
-    t.initiator?.pseudo?.toLowerCase().includes(q) ||
-    t.receiver?.pseudo?.toLowerCase().includes(q)
+    String(t.id).includes(q) ||
+    t.status?.toLowerCase().includes(q)
   )
 })
 function statusClass(s) {

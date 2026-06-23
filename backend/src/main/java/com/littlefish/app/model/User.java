@@ -1,9 +1,11 @@
 package com.littlefish.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.littlefish.app.model.enums.Role;
 import com.littlefish.app.model.enums.Theme;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -13,6 +15,7 @@ import java.util.List;
 @Table(name = "users")
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = {"aquarium", "dailyChallengeEntries"})
 public class User {
 
     @Id
@@ -47,7 +50,8 @@ public class User {
 
     @OneToMany(mappedBy = "initiator", cascade = CascadeType.ALL)
     private List<Trade> trades;
-
+    
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<DailyChallenge> dailyChallenges;
+    @JsonIgnore
+    private List<DailyChallengeUser> dailyChallengeEntries;
 }

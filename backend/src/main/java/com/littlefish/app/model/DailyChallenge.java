@@ -3,10 +3,9 @@ package com.littlefish.app.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
-import java.time.LocalDate;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Data
@@ -19,12 +18,9 @@ public class DailyChallenge {
 
     private String name;
     private int reward;
-    private LocalDate date;
-    private boolean completed;
     private String description;
 
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @OneToMany(mappedBy = "dailyChallenge", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<DailyChallengeUser> userEntries;
 }
