@@ -21,8 +21,6 @@ import AdminTrades from '@/views/admin/AdminTrades.vue'
 import AdminChallenges from '@/views/admin/AdminChallenges.vue'
 import AdminFriendships from '@/views/admin/AdminFriendships.vue'
 import AdminNotifications from '@/views/admin/AdminNotifications.vue'
-import AdminConfig from '@/views/admin/AdminConfig.vue'
-
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -49,7 +47,6 @@ const router = createRouter({
       { path: 'challenges',   component: AdminChallenges },
       { path: 'friendships',  component: AdminFriendships },
       { path: 'notifications',component: AdminNotifications },
-      { path: 'config',       component: AdminConfig },
     ]},
   ],
 })

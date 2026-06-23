@@ -51,6 +51,14 @@
           <label>Size<input type="number" v-model.number="modal.data.size" /></label>
           <label>Age<input type="number" v-model.number="modal.data.age" /></label>
           <label>Life Points<input type="number" v-model.number="modal.data.lifePoints" /></label>
+          <label>Aquarium
+          <select v-model="modal.data.aquariumId">
+            <option :value="null" disabled>Select an aquarium…</option>
+            <option v-for="aq in aquariums" :key="aq.id" :value="aq.id">
+              {{ aq.name }} ({{ aq.fish?.length ?? 0 }}/{{ aq.capacity }})
+            </option>
+          </select>
+        </label>
         </div>
         <div class="admin-modal__actions">
           <button class="btn-cancel" @click="closeModal">Cancel</button>
@@ -73,6 +81,7 @@ const search  = ref('')
 const saving  = ref(false)
 const modal   = reactive({ open: false, mode: 'create', data: {} })
 const toast   = reactive({ visible: false, message: '', type: 'success' })
+const aquariums = ref([])
 let toastTimer = null
 
 function showToast(msg, type = 'success') {
@@ -88,12 +97,22 @@ const filtered = computed(() => {
 
 async function load() {
   loading.value = true; error.value = null
-  try { items.value = await get_api('/api/fish') }
+  try {
+    ;[items.value, aquariums.value] = await Promise.all([
+      get_api('/api/fish'),
+      get_api('/api/aquariums'),
+    ])
+  }
   catch { error.value = 'Failed to load fish' }
   finally { loading.value = false }
 }
 
-function openCreate() { Object.assign(modal, { open: true, mode: 'create', data: { name: '', species: '', color: '', price: 10, size: 1, age: 0, lifePoints: 100 } }) }
+function openCreate() {
+  Object.assign(modal, {
+    open: true, mode: 'create',
+    data: { name: '', species: '', color: '', price: 10, size: 1, age: 0, lifePoints: 100, aquariumId: null }
+  })
+}
 function openEdit(f)  { Object.assign(modal, { open: true, mode: 'edit', data: { ...f } }) }
 function closeModal() { modal.open = false }
 

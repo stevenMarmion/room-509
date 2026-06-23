@@ -1,6 +1,7 @@
 package com.littlefish.app.controller;
 
 import com.littlefish.app.model.DailyChallenge;
+import com.littlefish.app.model.DailyChallengeUser;
 import com.littlefish.app.service.DailyChallengeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,18 @@ public class DailyChallengeController {
     @GetMapping("/{id}")
     public ResponseEntity<DailyChallenge> getById(@PathVariable Long id) {
         return dailyChallengeService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<DailyChallengeUser>> getByUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(dailyChallengeService.findByUser(userId));
+    }
+
+    @PostMapping("/{challengeId}/complete/{userId}")
+    public ResponseEntity<DailyChallengeUser> complete(@PathVariable Long challengeId, @PathVariable Long userId) {
+        return dailyChallengeService.completeChallenge(challengeId, userId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

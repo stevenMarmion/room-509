@@ -12,6 +12,7 @@ import com.littlefish.app.model.User;
 import com.littlefish.app.model.enums.FriendStatus;
 import com.littlefish.app.repository.FriendshipRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -130,6 +131,19 @@ public class FriendshipService {
 
     public void deleteById(Long id) {
         friendshipRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteFriendship(Long id) {
+        Optional<Friendship> friendshipOpt = friendshipRepository.findById(id);
+        if (friendshipOpt.isEmpty()) return;
+
+        Friendship friendship = friendshipOpt.get();
+        User sender   = friendship.getRequester();
+        User receiver = friendship.getAddressee();
+
+        friendshipRepository.deleteByRequesterAndAddressee(sender, receiver);
+        friendshipRepository.deleteByRequesterAndAddressee(receiver, sender);
     }
 
     public FriendshipDTO toDTO(Friendship f, String requesterPseudo) {

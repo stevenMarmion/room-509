@@ -8,15 +8,29 @@
     <div v-if="loading" class="admin-state">Loading…</div>
     <div v-else class="admin-table-wrap">
       <table class="admin-table">
-        <thead><tr><th>ID</th><th>Name</th><th>Reward</th><th>Date</th><th>Completed</th><th>Description</th><th>Actions</th></tr></thead>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Reward</th>
+            <th>Description</th>
+            <th>Assigned to</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
         <tbody>
           <tr v-for="c in filtered" :key="c.id">
             <td class="td-muted">{{ c.id }}</td>
             <td class="td-bold">{{ c.name }}</td>
             <td><span class="badge badge--gold">{{ c.reward }}</span></td>
-            <td class="td-muted">{{ c.date }}</td>
-            <td><span class="badge" :class="c.completed ? 'badge--green' : 'badge--grey'">{{ c.completed ? 'Yes' : 'No' }}</span></td>
-            <td class="td-muted" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ c.description }}</td>
+            <td class="td-muted" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+              {{ c.description }}
+            </td>
+            <td>
+              <span class="badge badge--teal">
+                {{ c.userEntries?.length ?? 0 }} users
+              </span>
+            </td>
             <td class="td-actions">
               <button class="btn-edit" @click="openEdit(c)">Edit</button>
               <button class="btn-del"  @click="remove(c.id)">Delete</button>
@@ -32,12 +46,7 @@
         <div class="admin-form">
           <label>Name<input v-model="modal.data.name" /></label>
           <label>Reward<input type="number" v-model.number="modal.data.reward" /></label>
-          <label>Date<input type="date" v-model="modal.data.date" /></label>
           <label>Description<textarea v-model="modal.data.description"></textarea></label>
-          <label style="flex-direction:row;align-items:center;gap:0.5rem;">
-            <input type="checkbox" v-model="modal.data.completed" style="width:auto;" />
-            Completed
-          </label>
         </div>
         <div class="admin-modal__actions">
           <button class="btn-cancel" @click="closeModal">Cancel</button>
@@ -53,25 +62,47 @@ import { ref, computed, onMounted, reactive } from 'vue'
 import { get_api, post_api, put_api, delete_api } from '@/services/api.js'
 import AdminToast from './AdminToast.vue'
 
-const items = ref([]), loading = ref(false), search = ref(''), saving = ref(false)
-const toast = reactive({ visible: false, message: '', type: 'success' })
-const modal = reactive({ open: false, mode: 'create', data: {} })
+const items   = ref([])
+const loading = ref(false)
+const search  = ref('')
+const saving  = ref(false)
+const toast   = reactive({ visible: false, message: '', type: 'success' })
+const modal   = reactive({ open: false, mode: 'create', data: {} })
 let toastTimer = null
+
 function showToast(msg, type = 'success') {
   clearTimeout(toastTimer)
   Object.assign(toast, { visible: true, message: msg, type })
   toastTimer = setTimeout(() => { toast.visible = false }, 3000)
 }
-const filtered = computed(() => items.value.filter(c => c.name?.toLowerCase().includes(search.value.toLowerCase())))
+
+const filtered = computed(() =>
+  items.value.filter(c => c.name?.toLowerCase().includes(search.value.toLowerCase()))
+)
+
 async function load() {
   loading.value = true
   try { items.value = await get_api('/api/challenges') }
   catch { showToast('Load failed', 'error') }
   finally { loading.value = false }
 }
-function openCreate() { Object.assign(modal, { open: true, mode: 'create', data: { name: '', reward: 10, date: new Date().toISOString().slice(0,10), description: '', completed: false } }) }
-function openEdit(c)  { Object.assign(modal, { open: true, mode: 'edit', data: { ...c } }) }
+
+function openCreate() {
+  Object.assign(modal, {
+    open: true, mode: 'create',
+    data: { name: '', reward: 10, description: '' }  // plus de date ni completed
+  })
+}
+
+function openEdit(c) {
+  Object.assign(modal, {
+    open: true, mode: 'edit',
+    data: { id: c.id, name: c.name, reward: c.reward, description: c.description }
+  })
+}
+
 function closeModal() { modal.open = false }
+
 async function save() {
   saving.value = true
   try {
@@ -83,15 +114,21 @@ async function save() {
       const idx = items.value.findIndex(c => c.id === modal.data.id)
       if (idx !== -1) items.value[idx] = updated
     }
-    showToast('Saved'); closeModal()
+    showToast('Saved')
+    closeModal()
   } catch { showToast('Save failed', 'error') }
   finally { saving.value = false }
 }
+
 async function remove(id) {
-  if (!confirm('Delete challenge?')) return
-  try { await delete_api(`/api/challenges/${id}`); items.value = items.value.filter(c => c.id !== id); showToast('Deleted') }
-  catch { showToast('Delete failed', 'error') }
+  if (!confirm('Delete challenge? This will also remove all user assignments.')) return
+  try {
+    await delete_api(`/api/challenges/${id}`)
+    items.value = items.value.filter(c => c.id !== id)
+    showToast('Deleted')
+  } catch { showToast('Delete failed', 'error') }
 }
+
 onMounted(load)
 </script>
 <style scoped src="@/assets/admin.css" />

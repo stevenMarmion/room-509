@@ -4,6 +4,7 @@
 
     <div class="admin-toolbar">
       <input v-model="search" class="admin-search" placeholder="Search by pseudo or email…" />
+      <button class="btn-create" @click="openCreate">+ New User</button>
     </div>
 
     <div v-if="loading" class="admin-state">Loading…</div>
@@ -28,20 +29,22 @@
             <td class="td-muted">{{ formatDate(u.createdAt) }}</td>
             <td class="td-actions">
               <button class="btn-edit" @click="openEdit(u)">Edit</button>
-              <button class="btn-del"  @click="remove(u.pseudo, 'pseudo')">Delete</button>
+              <button class="btn-del"  @click="remove(u.pseudo)">Delete</button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Modal -->
     <div v-if="modal.open" class="admin-modal-backdrop" @click.self="closeModal">
       <div class="admin-modal">
-        <h2 class="admin-modal__title">Edit User</h2>
+        <h2 class="admin-modal__title">{{ modal.mode === 'create' ? 'New User' : 'Edit User' }}</h2>
         <div class="admin-form">
           <label>Pseudo<input v-model="modal.data.pseudo" /></label>
           <label>Email<input v-model="modal.data.email" /></label>
+          <label v-if="modal.mode === 'create'">
+            Password<input type="password" v-model="modal.data.password" />
+          </label>
           <label>Avatar<input v-model="modal.data.avatar" /></label>
           <label>Coins<input type="number" v-model.number="modal.data.coins" /></label>
           <label>Role
@@ -59,7 +62,7 @@
         </div>
         <div class="admin-modal__actions">
           <button class="btn-cancel" @click="closeModal">Cancel</button>
-          <button class="btn-save" :disabled="saving" @click="saveUser">{{ saving ? 'Saving…' : 'Save' }}</button>
+          <button class="btn-save" :disabled="saving" @click="save">{{ saving ? 'Saving…' : 'Save' }}</button>
         </div>
       </div>
     </div>
@@ -68,16 +71,19 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { get_api, put_api, patch_api, delete_api } from '@/services/api.js'
+import { get_api, post_api, put_api, patch_api, delete_api } from '@/services/api.js'
 import AdminToast from './AdminToast.vue'
+import { useAuthStore } from '@/stores/auth.js'
 
+const authStore = useAuthStore()
 const items   = ref([])
 const loading = ref(false)
 const error   = ref(null)
 const search  = ref('')
 const saving  = ref(false)
-const modal   = ref({ open: false, data: {} })
+const modal   = ref({ open: false, mode: 'create', data: {} })
 const toast   = ref({ visible: false, message: '', type: 'success' })
+const initialPseudo = ref('')
 let toastTimer = null
 
 function showToast(msg, type = 'success') {
@@ -103,23 +109,67 @@ async function load() {
   finally { loading.value = false }
 }
 
-function openEdit(u) { modal.value = { open: true, data: { ...u } } }
-function closeModal() { modal.value = { open: false, data: {} } }
+function openCreate() {
+  modal.value = {
+    open: true,
+    mode: 'create',
+    data: { pseudo: '', email: '', password: '', avatar: '', coins: 0, role: 'USER', theme: 'LIGHT' }
+  }
+}
 
-async function saveUser() {
+function openEdit(u) {
+  initialPseudo.value = u.pseudo
+  modal.value = { open: true, mode: 'edit', data: { ...u } }
+}
+
+function closeModal() { modal.value = { open: false, mode: 'create', data: {} } }
+
+async function save() {
   saving.value = true
   try {
-    const d = modal.value.data
-    // Update base fields
-    await put_api(`/api/users/${d.pseudo}`, { pseudo: d.pseudo, email: d.email, avatar: d.avatar, theme: d.theme })
-    // Update role separately
-    await patch_api(`/api/users/${d.pseudo}/role`, { role: d.role })
-    // Update coins separately
-    await patch_api(`/api/users/${d.pseudo}/coins`, { coins: d.coins })
+    if (modal.value.mode === 'create') {
+      // Utilise l'endpoint register existant
+      await post_api('/api/auth/register', {
+        pseudo:   modal.value.data.pseudo,
+        email:    modal.value.data.email,
+        password: modal.value.data.password,
+        passwordConfirm: modal.value.data.password,
+      })
+      // Applique coins/role/theme si différents des défauts
+      const pseudo = modal.value.data.pseudo
+      if (modal.value.data.role !== 'USER')
+        await patch_api(`/api/users/${pseudo}/role`, { role: modal.value.data.role })
+      if (modal.value.data.coins !== 0)
+        await patch_api(`/api/users/${pseudo}/coins`, { coins: modal.value.data.coins })
+      // avatar et theme via PUT si renseignés
+      if (modal.value.data.avatar || modal.value.data.theme !== 'LIGHT')
+        await put_api(`/api/users/${pseudo}`, {
+          pseudo,
+          email:  modal.value.data.email,
+          avatar: modal.value.data.avatar,
+          theme:  modal.value.data.theme,
+        })
+      showToast('User created')
+    } else {
+      const d = modal.value.data
+      const wasCurrentUser = initialPseudo.value === authStore.pseudo
+
+      await put_api(`/api/users/${initialPseudo.value}`, { pseudo: d.pseudo, email: d.email, avatar: d.avatar, theme: d.theme })
+      await patch_api(`/api/users/${d.pseudo}/role`, { role: d.role })
+      await patch_api(`/api/users/${d.pseudo}/coins`, { coins: d.coins })
+
+      if (wasCurrentUser) {
+        authStore.pseudo = d.pseudo
+        authStore.role   = d.role
+        sessionStorage.setItem('pseudo', d.pseudo)
+        sessionStorage.setItem('role',   d.role)
+      }
+      showToast('User updated')
+    }
+
     await load()
     closeModal()
-    showToast('User updated')
-  } catch { showToast('Update failed', 'error') }
+  } catch { showToast('Save failed', 'error') }
   finally { saving.value = false }
 }
 

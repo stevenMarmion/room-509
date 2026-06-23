@@ -2,16 +2,18 @@
   <div class="admin-section">
     <AdminToast :toast="toast" />
     <div class="admin-toolbar">
-      <input v-model="search" class="admin-search" placeholder="Search…" />
+      <input v-model="search" class="admin-search" placeholder="Search by pseudo…" />
     </div>
     <div v-if="loading" class="admin-state">Loading…</div>
     <div v-else class="admin-table-wrap">
       <table class="admin-table">
-        <thead><tr><th>ID</th><th>User</th><th>On Death</th><th>Before Death</th><th>Daily Reminder</th><th>Actions</th></tr></thead>
+        <thead>
+          <tr><th>ID</th><th>User</th><th>On Death</th><th>Before Death</th><th>Daily Reminder</th><th>Actions</th></tr>
+        </thead>
         <tbody>
           <tr v-for="n in filtered" :key="n.id">
             <td class="td-muted">{{ n.id }}</td>
-            <td class="td-bold">{{ n.user?.pseudo ?? n.userId ?? '—' }}</td>
+            <td class="td-bold">{{ n.pseudo ?? '—' }}</td>
             <td><span class="badge" :class="n.notifyOnDeath ? 'badge--green' : 'badge--grey'">{{ n.notifyOnDeath ? 'Yes' : 'No' }}</span></td>
             <td><span class="badge" :class="n.notifyBeforeDeath ? 'badge--green' : 'badge--grey'">{{ n.notifyBeforeDeath ? 'Yes' : 'No' }}</span></td>
             <td><span class="badge" :class="n.dailyReminder ? 'badge--green' : 'badge--grey'">{{ n.dailyReminder ? 'Yes' : 'No' }}</span></td>
@@ -25,7 +27,7 @@
 
     <div v-if="modal.open" class="admin-modal-backdrop" @click.self="closeModal">
       <div class="admin-modal">
-        <h2 class="admin-modal__title">Edit Notification Preferences</h2>
+        <h2 class="admin-modal__title">Edit — {{ modal.data.pseudo }}</h2>
         <div class="admin-form">
           <label style="flex-direction:row;align-items:center;gap:0.5rem;">
             <input type="checkbox" v-model="modal.data.notifyOnDeath" style="width:auto;" /> Notify on Death
@@ -55,32 +57,41 @@ const items = ref([]), loading = ref(false), search = ref(''), saving = ref(fals
 const toast = reactive({ visible: false, message: '', type: 'success' })
 const modal = reactive({ open: false, data: {} })
 let toastTimer = null
+
 function showToast(msg, type = 'success') {
   clearTimeout(toastTimer)
   Object.assign(toast, { visible: true, message: msg, type })
   toastTimer = setTimeout(() => { toast.visible = false }, 3000)
 }
-const filtered = computed(() => items.value.filter(n =>
-  n.user?.pseudo?.toLowerCase().includes(search.value.toLowerCase())
-))
+
+const filtered = computed(() => {
+  const q = search.value.toLowerCase()
+  if (!q) return items.value
+  return items.value.filter(n => n.pseudo?.toLowerCase().includes(q))
+})
+
 async function load() {
   loading.value = true
   try { items.value = await get_api('/api/notifications') }
   catch { showToast('Load failed', 'error') }
   finally { loading.value = false }
 }
+
 function openEdit(n)  { Object.assign(modal, { open: true, data: { ...n } }) }
 function closeModal() { modal.open = false }
+
 async function save() {
   saving.value = true
   try {
     const updated = await put_api(`/api/notifications/${modal.data.id}`, modal.data)
     const idx = items.value.findIndex(n => n.id === modal.data.id)
     if (idx !== -1) items.value[idx] = updated
-    showToast('Updated'); closeModal()
+    showToast('Updated')
+    closeModal()
   } catch { showToast('Save failed', 'error') }
   finally { saving.value = false }
 }
+
 onMounted(load)
 </script>
 <style scoped src="@/assets/admin.css" />
