@@ -1,14 +1,13 @@
 <template>
   <main class="profile-layout">
 
-    <!-- ── Toast ── -->
     <Transition name="toast">
       <div v-if="toast.visible" class="toast-notif" :class="`toast-notif--${toast.type}`">
         {{ toast.message }}
       </div>
     </Transition>
 
-    <!-- ── Avatar + pseudo ── -->
+    <!-- Avatar + pseudo -->
     <div class="pcard">
       <div class="profile-header">
         <div class="avatar-circle">{{ avatarInitial }}</div>
@@ -20,7 +19,7 @@
       </div>
     </div>
 
-    <!-- ── Stats ── -->
+    <!-- Stats -->
     <div class="pcard">
       <div class="section-title">Stats</div>
       <div class="stats-grid">
@@ -39,7 +38,7 @@
       </div>
     </div>
 
-    <!-- ── Edit profile ── -->
+    <!-- Edit profile -->
     <div class="pcard">
       <div class="section-title">Edit profile</div>
       <form @submit.prevent="saveProfile">
@@ -63,7 +62,44 @@
       </form>
     </div>
 
-    <!-- ── Theme ── -->
+    <!-- Notifications -->
+    <div class="pcard">
+      <div class="section-title">Notifications</div>
+      <div class="notif-list">
+        <div class="notif-row">
+          <div>
+            <div class="notif-label">Fish death alert</div>
+            <div class="notif-hint">Get notified when a fish dies in your aquarium.</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" v-model="notifForm.notifyOnDeath" @change="saveNotifications" />
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+        <div class="notif-row">
+          <div>
+            <div class="notif-label">Fish in danger</div>
+            <div class="notif-hint">Get notified before a fish is about to die.</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" v-model="notifForm.notifyBeforeDeath" @change="saveNotifications" />
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+        <div class="notif-row">
+          <div>
+            <div class="notif-label">Daily reminder</div>
+            <div class="notif-hint">Receive a daily reminder to feed your fish.</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" v-model="notifForm.dailyReminder" @change="saveNotifications" />
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Theme -->
     <div class="pcard">
       <div class="section-title">Theme</div>
       <div class="theme-row">
@@ -78,7 +114,7 @@
       </div>
     </div>
 
-    <!-- ── Danger zone ── -->
+    <!-- Danger zone -->
     <div class="pcard pcard--danger">
       <div class="section-title section-title--danger">Danger zone</div>
       <div class="danger-row">
@@ -90,7 +126,7 @@
       </div>
     </div>
 
-    <!-- ── Logout ── -->
+    <!-- Logout -->
     <div class="pcard">
       <div class="section-title">Session</div>
       <div class="danger-row">
@@ -102,7 +138,7 @@
       </div>
     </div>
 
-      <!-- ── Admin panel ── -->
+    <!-- Admin panel -->
     <div v-if="authStore.role === 'ADMIN'" class="pcard pcard--admin">
       <div class="section-title section-title--admin">Administration</div>
       <div class="danger-row">
@@ -116,7 +152,7 @@
 
   </main>
 
-  <!-- ── Password modal ── -->
+  <!-- Password modal -->
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="showPasswordModal" class="modal-backdrop" @click.self="closePasswordModal">
@@ -152,17 +188,9 @@ import { RouterLink } from 'vue-router'
 const authStore = useAuthStore()
 const router = useRouter()
 
-// ── User state ────────────────────────────────────────────────────────────────
-
 const user = reactive({
-  pseudo:      '',
-  role:        '',
-  coins:       0,
-  fishCount:   0,
-  friendCount: 0,
-  email:       '',
-  createdAt:   null,
-  theme:       'LIGHT',
+  pseudo: '', role: '', coins: 0, fishCount: 0,
+  friendCount: 0, email: '', createdAt: null, theme: 'LIGHT',
 })
 
 const avatarInitial = computed(() =>
@@ -176,17 +204,20 @@ const joinedLabel = computed(() => {
   })
 })
 
-// ── Form state ────────────────────────────────────────────────────────────────
-
 const form = reactive({ pseudo: '', email: '' })
 const isDark = ref(false)
+
+const notifForm = reactive({
+  notifyOnDeath: false,
+  notifyBeforeDeath: false,
+  dailyReminder: false,
+})
+let notifId = null
 
 function resetForm() {
   form.pseudo = user.pseudo
   form.email  = user.email
 }
-
-// ── Toast ─────────────────────────────────────────────────────────────────────
 
 const toast = reactive({ visible: false, message: '', type: 'success' })
 let toastTimer = null
@@ -198,8 +229,6 @@ function showToast(message, type = 'success') {
   toast.visible = true
   toastTimer = setTimeout(() => { toast.visible = false }, 3500)
 }
-
-// ── Load profile ──────────────────────────────────────────────────────────────
 
 async function loadProfile() {
   try {
@@ -214,7 +243,28 @@ async function loadProfile() {
   }
 }
 
-// ── Save profile ──────────────────────────────────────────────────────────────
+async function loadNotifications() {
+  try {
+    // l'endpoint retourne la préférence de l'utilisateur courant
+    const data = await get_api(`/api/notifications/me`)
+    notifId = data.id
+    notifForm.notifyOnDeath   = data.notifyOnDeath
+    notifForm.notifyBeforeDeath = data.notifyBeforeDeath
+    notifForm.dailyReminder   = data.dailyReminder
+  } catch {
+    console.warn('Could not load notification preferences.')
+  }
+}
+
+async function saveNotifications() {
+  if (!notifId) return
+  try {
+    await put_api(`/api/notifications/${notifId}`, { ...notifForm })
+    showToast('Notification preferences saved.', 'success')
+  } catch {
+    showToast('Could not save notification preferences.', 'error')
+  }
+}
 
 async function saveProfile() {
   try {
@@ -227,8 +277,6 @@ async function saveProfile() {
   }
 }
 
-// ── Theme ─────────────────────────────────────────────────────────────────────
-
 async function saveTheme() {
   try {
     await put_api(`/api/users/${authStore.pseudo}`, { theme: isDark.value ? 'DARK' : 'LIGHT' })
@@ -236,8 +284,6 @@ async function saveTheme() {
     console.warn('Could not update theme.')
   }
 }
-
-// ── Password modal ────────────────────────────────────────────────────────────
 
 const showPasswordModal = ref(false)
 const passwordForm = reactive({ password: '', confirm: '' })
@@ -247,19 +293,14 @@ function openPasswordModal() {
   passwordForm.confirm  = ''
   showPasswordModal.value = true
 }
-
-function closePasswordModal() {
-  showPasswordModal.value = false
-}
+function closePasswordModal() { showPasswordModal.value = false }
 
 async function savePassword() {
   if (!passwordForm.password) {
-    showToast('Please enter a new password.', 'error')
-    return
+    showToast('Please enter a new password.', 'error'); return
   }
   if (passwordForm.password !== passwordForm.confirm) {
-    showToast('Passwords do not match.', 'error')
-    return
+    showToast('Passwords do not match.', 'error'); return
   }
   try {
     await put_api(`/api/users/${authStore.pseudo}`, { password: passwordForm.password })
@@ -270,8 +311,6 @@ async function savePassword() {
   }
 }
 
-// ── Logout ────────────────────────────────────────────────────────────────────
-
 async function handleLogout() {
   try {
     await authStore.logout()
@@ -281,15 +320,13 @@ async function handleLogout() {
   }
 }
 
-// Close modal on Escape key
 function onKeyDown(e) {
   if (e.key === 'Escape' && showPasswordModal.value) closePasswordModal()
 }
 
-// ── Lifecycle ─────────────────────────────────────────────────────────────────
-
 onMounted(() => {
   loadProfile()
+  loadNotifications()
   document.addEventListener('keydown', onKeyDown)
 })
 
@@ -300,250 +337,79 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.pcard--admin  { border: 1.5px solid #e8f7f7; }
-.section-title--admin { color: #0d7377; }
-.btn-admin {
-  background: #0d2137;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 0.6rem 1.4rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: opacity 0.2s;
-}
-.btn-admin:hover { opacity: 0.85; }
-
-/* ── Layout ── */
-.profile-layout {
-  max-width: 760px;
-  margin: 2rem auto;
-  padding: 0 1.5rem;
+/* ── Notifications ── */
+.notif-list {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 0;
 }
-
-/* ── Card ── */
-.pcard {
-  background: #fff;
-  border-radius: 14px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
-}
-.pcard--danger { border: 1.5px solid #fde8e8; }
-
-/* ── Avatar ── */
-.profile-header {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-.avatar-circle {
-  width: 80px; height: 80px;
-  border-radius: 50%;
-  background: #0d7377;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  font-size: 2rem;
-  color: #fff;
-  font-weight: 700;
-}
-.profile-meta h2 {
-  font-size: 1.25rem;
-  color: #1a3a4a;
-  margin-bottom: 0.2rem;
-}
-.role-badge {
-  display: inline-block;
-  background: #e8f7f7;
-  color: #0d7377;
-  border-radius: 999px;
-  padding: 0.15rem 0.75rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-.joined {
-  font-size: 0.8rem;
-  color: #aaa;
-  margin-top: 0.3rem;
-}
-
-/* ── Section title ── */
-.section-title {
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #0d7377;
-  margin-bottom: 1rem;
-}
-.section-title--danger { color: #e74c3c; }
-
-/* ── Stats ── */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  text-align: center;
-}
-.stat-item strong {
-  display: block;
-  font-size: 1.5rem;
-  color: #0d7377;
-  font-weight: 700;
-}
-.stat-item span { font-size: 0.8rem; color: #888; }
-
-/* ── Form ── */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-label {
-  font-size: 0.82rem;
-  color: #666;
-  font-weight: 500;
-}
-input[type="text"],
-input[type="email"],
-input[type="password"] {
-  border: 1.5px solid #dde3ea;
-  border-radius: 8px;
-  padding: 0.55rem 0.8rem;
-  font-size: 0.9rem;
-  color: #1a3a4a;
-  outline: none;
-  transition: border-color 0.2s;
-  background: #fafbfc;
-  width: 100%;
-}
-input:focus { border-color: #0d7377; background: #fff; }
-
-/* ── Buttons ── */
-.btn-row {
+.notif-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.8rem;
-  margin-top: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid #f0f4f8;
 }
-.btn-row-right {
-  display: flex;
-  gap: 0.8rem;
+.notif-row:last-child { border-bottom: none; }
+.notif-label { font-size: 0.9rem; color: #1a3a4a; font-weight: 500; }
+.notif-hint  { font-size: 0.78rem; color: #aaa; margin-top: 0.1rem; }
+
+/* ── (tout le reste du style inchangé) ── */
+.pcard--admin  { border: 1.5px solid #e8f7f7; }
+.section-title--admin { color: #0d7377; }
+.btn-admin {
+  background: #0d2137; color: #fff; border: none; border-radius: 8px;
+  padding: 0.6rem 1.4rem; font-size: 0.9rem; font-weight: 600;
+  cursor: pointer; text-decoration: none; white-space: nowrap; transition: opacity 0.2s;
 }
-button {
-  border: none;
-  border-radius: 8px;
-  padding: 0.6rem 1.4rem;
-  font-size: 0.9rem;
-  cursor: pointer;
-  font-weight: 600;
-  transition: opacity 0.2s;
-}
+.btn-admin:hover { opacity: 0.85; }
+.profile-layout { max-width: 760px; margin: 2rem auto; padding: 0 1.5rem; display: flex; flex-direction: column; gap: 1.2rem; }
+.pcard { background: #fff; border-radius: 14px; padding: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+.pcard--danger { border: 1.5px solid #fde8e8; }
+.profile-header { display: flex; align-items: center; gap: 1.5rem; }
+.avatar-circle { width: 80px; height: 80px; border-radius: 50%; background: #0d7377; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 2rem; color: #fff; font-weight: 700; }
+.profile-meta h2 { font-size: 1.25rem; color: #1a3a4a; margin-bottom: 0.2rem; }
+.role-badge { display: inline-block; background: #e8f7f7; color: #0d7377; border-radius: 999px; padding: 0.15rem 0.75rem; font-size: 0.78rem; font-weight: 600; }
+.joined { font-size: 0.8rem; color: #aaa; margin-top: 0.3rem; }
+.section-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #0d7377; margin-bottom: 1rem; }
+.section-title--danger { color: #e74c3c; }
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center; }
+.stat-item strong { display: block; font-size: 1.5rem; color: #0d7377; font-weight: 700; }
+.stat-item span { font-size: 0.8rem; color: #888; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+label { font-size: 0.82rem; color: #666; font-weight: 500; }
+input[type="text"], input[type="email"], input[type="password"] { border: 1.5px solid #dde3ea; border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.9rem; color: #1a3a4a; outline: none; transition: border-color 0.2s; background: #fafbfc; width: 100%; }
+input:focus { border-color: #0d7377; background: #fff; }
+.btn-row { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; margin-top: 1rem; }
+.btn-row-right { display: flex; gap: 0.8rem; }
+button { border: none; border-radius: 8px; padding: 0.6rem 1.4rem; font-size: 0.9rem; cursor: pointer; font-weight: 600; transition: opacity 0.2s; }
 button:hover { opacity: 0.85; }
 .btn-primary { background: #0d7377; color: #fff; }
 .btn-ghost   { background: #f0f4f8; color: #555; }
 .btn-danger  { background: #fff; color: #e74c3c; border: 1.5px solid #e74c3c; }
-
-/* ── Theme toggle ── */
-.theme-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+.theme-row { display: flex; align-items: center; justify-content: space-between; }
 .theme-label { font-size: 0.9rem; color: #1a3a4a; }
 .theme-label small { display: block; font-size: 0.78rem; color: #aaa; }
-
 .toggle { position: relative; width: 52px; height: 28px; }
 .toggle input { display: none; }
-.toggle-track {
-  position: absolute;
-  inset: 0;
-  background: #dde3ea;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
+.toggle-track { position: absolute; inset: 0; background: #dde3ea; border-radius: 999px; cursor: pointer; transition: background 0.3s; }
 .toggle input:checked + .toggle-track { background: #0d7377; }
-.toggle-track::after {
-  content: '';
-  position: absolute;
-  top: 3px; left: 3px;
-  width: 22px; height: 22px;
-  border-radius: 50%;
-  background: #fff;
-  transition: transform 0.3s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
+.toggle-track::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: transform 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 .toggle input:checked + .toggle-track::after { transform: translateX(24px); }
-
-/* ── Danger zone ── */
-.danger-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+.danger-row { display: flex; align-items: center; justify-content: space-between; }
 .danger-label { font-size: 0.9rem; color: #1a3a4a; font-weight: 500; }
 .danger-hint  { font-size: 0.78rem; color: #aaa; }
-
-/* ── Toast ── */
-.toast-notif {
-  position: fixed;
-  bottom: 1.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 0.7rem 1.4rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #fff;
-  z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
+.toast-notif { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); padding: 0.7rem 1.4rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600; color: #fff; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 .toast-notif--success { background: #0d7377; }
 .toast-notif--error   { background: #e74c3c; }
-
 .toast-enter-active, .toast-leave-active { transition: opacity 0.3s, transform 0.3s; }
 .toast-enter-from, .toast-leave-to { opacity: 0; transform: translateX(-50%) translateY(10px); }
-
-/* ── Modal ── */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-.modal-box {
-  background: #fff;
-  border-radius: 14px;
-  padding: 2rem;
-  width: 100%;
-  max-width: 420px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-}
-.modal-box h3 {
-  font-size: 1.1rem;
-  color: #1a3a4a;
-  margin-bottom: 1.2rem;
-}
-
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 999; }
+.modal-box { background: #fff; border-radius: 14px; padding: 2rem; width: 100%; max-width: 420px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+.modal-box h3 { font-size: 1.1rem; color: #1a3a4a; margin-bottom: 1.2rem; }
 .modal-enter-active, .modal-leave-active { transition: opacity 0.25s, transform 0.25s; }
 .modal-enter-from, .modal-leave-to { opacity: 0; transform: scale(0.96); }
-
-/* ── Responsive ── */
 @media (max-width: 560px) {
   .form-grid { grid-template-columns: 1fr; }
   .btn-row { flex-direction: column; align-items: stretch; }
