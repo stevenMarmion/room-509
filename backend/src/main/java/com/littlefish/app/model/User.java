@@ -52,6 +52,6 @@ public class User {
     
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
-    @ToString.Exclude
+    // @ToString.Exclude
     private List<DailyChallengeUser> dailyChallengeEntries;
 }

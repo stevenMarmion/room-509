@@ -25,13 +25,13 @@ public class Friendship {
     private LocalDateTime since;
 
     @JsonIgnore
-    @ToString.Exclude
+    // @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "requester_id")
     private User requester;
 
     @JsonIgnore
-    @ToString.Exclude
+    // @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "addressee_id")
     private User addressee;

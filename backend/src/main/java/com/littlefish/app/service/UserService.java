@@ -112,6 +112,7 @@ public class UserService {
         return Optional.of(userRepository.save(user));
     }
 
+    @Transactional
     public void deleteByPseudo(String pseudo) {
         userRepository.deleteByPseudo(pseudo);
     }

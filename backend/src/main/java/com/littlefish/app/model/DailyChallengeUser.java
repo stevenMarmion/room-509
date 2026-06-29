@@ -25,7 +25,7 @@ public class DailyChallengeUser {
     @MapsId("dailyChallengeId")
     @JoinColumn(name = "daily_challenge_id")
     @JsonBackReference
-    @ToString.Exclude
+    // @ToString.Exclude
     private DailyChallenge dailyChallenge;
 
     @ManyToOne

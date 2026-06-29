@@ -13,7 +13,7 @@
         <RouterLink to="/my-fish">My Fish</RouterLink>
         <RouterLink to="/friends">Friends</RouterLink>
         <RouterLink to="/shop">Shop</RouterLink>
-        <RouterLink to="/daily-challenges">Challenges</RouterLink>
+        <!-- <RouterLink to="/daily-challenges">Challenges</RouterLink> -->
       </nav>
 
       <!-- Legal -->
@@ -33,7 +33,7 @@ const currentYear = new Date().getFullYear()
 
 <style scoped>
 .footer {
-  /* margin-top: 300px; */
+  margin-top: 12rem;
   background: var(--c-brand);
   color: rgba(255, 255, 255, 0.75);
 }

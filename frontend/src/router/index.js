@@ -33,7 +33,7 @@ const router = createRouter({
     { path: '/my-fish',           component: FishView,             meta: { requiresAuth: true } },
     { path: '/friends',           component: FriendsView,          meta: { requiresAuth: true } },
     { path: '/shop',              component: ShopView,             meta: { requiresAuth: true } },
-    { path: '/daily-challenges',  component: DailyChallengesView,  meta: { requiresAuth: true } },
+    // { path: '/daily-challenges',  component: DailyChallengesView,  meta: { requiresAuth: true } },
     { path: '/trade',             component: TradeView,            meta: { requiresAuth: true } },
     { path: '/search',            component: SearchResultsView },
     { path: '/users/:pseudo',     component: UserProfileView },

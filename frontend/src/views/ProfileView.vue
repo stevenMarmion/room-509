@@ -63,7 +63,7 @@
     </div>
 
     <!-- Notifications -->
-    <div class="pcard">
+    <!-- <div class="pcard">
       <div class="section-title">Notifications</div>
       <div class="notif-list">
         <div class="notif-row">
@@ -97,7 +97,7 @@
           </label>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Theme -->
     <div class="pcard">
@@ -111,18 +111,6 @@
           <input type="checkbox" v-model="isDark" @change="saveTheme" />
           <div class="toggle-track"></div>
         </label>
-      </div>
-    </div>
-
-    <!-- Danger zone -->
-    <div class="pcard pcard--danger">
-      <div class="section-title section-title--danger">Danger zone</div>
-      <div class="danger-row">
-        <div>
-          <div class="danger-label">Delete account</div>
-          <div class="danger-hint">This action is irreversible.</div>
-        </div>
-        <button class="btn-danger">Delete my account</button>
       </div>
     </div>
 
@@ -234,7 +222,11 @@ async function loadProfile() {
   try {
     const data = await get_api(`/api/users/${authStore.pseudo}`)
     authStore.user = data
-    Object.assign(user, data)
+    Object.assign(user, {
+      ...data,
+      fishCount:   data.aquarium?.fish?.length ?? 0,
+      friendCount: data.friendships?.length ?? 0,
+    })
     resetForm()
     isDark.value = data.theme === 'DARK'
     authStore.role = data.role
