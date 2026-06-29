@@ -4,6 +4,7 @@ import com.littlefish.app.model.enums.FriendStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -19,17 +20,18 @@ public class Friendship {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "friend_status")
     private FriendStatus status;
 
     private LocalDateTime since;
 
     @JsonIgnore
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "requester_id")
     private User requester;
 
     @JsonIgnore
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "addressee_id")
     private User addressee;

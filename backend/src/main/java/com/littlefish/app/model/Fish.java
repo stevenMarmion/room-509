@@ -3,6 +3,7 @@ package com.littlefish.app.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,11 +29,13 @@ public class Fish {
     private LocalDateTime lastFedAt;
 
     @JsonIgnore
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "aquarium_id")
     private Aquarium aquarium;
 
     @JsonIgnore
+    @ToString.Exclude
     @ManyToMany(mappedBy = "fish")
     private List<Trade> trades;
 }
