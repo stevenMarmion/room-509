@@ -1,6 +1,5 @@
 package com.littlefish.app.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.littlefish.app.config.SecurityConfigTest;
 import com.littlefish.app.dto.FriendshipDTO;
 import com.littlefish.app.model.Friendship;
@@ -36,7 +35,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class FriendshipControllerTest {
 
     @Autowired MockMvc mockMvc;
-    private final ObjectMapper objectMapper = new ObjectMapper();
     @MockitoBean FriendshipService friendshipService;
 
     private User alice;
