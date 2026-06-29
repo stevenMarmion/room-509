@@ -132,60 +132,60 @@ CREATE TABLE aquarium_upgrade (
 );
 
 
--- ============================================================
---  V2 - Sample data
--- ============================================================
+-- -- ============================================================
+-- --  V2 - Sample data
+-- -- ============================================================
 
-INSERT INTO users (pseudo, email, password, theme, coins, role) VALUES
-    ('alice', 'alice@example.com', '$2a$10$7QJ8Z1e2Kp3mN5oP6qR8SuXvYwZaAbBcCdDeEfFgGhHiIjJkKlLm', 'LIGHT', 200, 'USER'),
-    ('bob',   'bob@example.com',   '$2a$10$7QJ8Z1e2Kp3mN5oP6qR8SuXvYwZaAbBcCdDeEfFgGhHiIjJkKlLm', 'DARK',  50, 'USER'),
-    ('admin', 'admin@example.com', '$2a$10$7QJ8Z1e2Kp3mN5oP6qR8SuXvYwZaAbBcCdDeEfFgGhHiIjJkKlLm', 'LIGHT', 500, 'ADMIN');
+-- INSERT INTO users (pseudo, email, password, theme, coins, role) VALUES
+--     ('alice', 'alice@example.com', '$2a$10$7QJ8Z1e2Kp3mN5oP6qR8SuXvYwZaAbBcCdDeEfFgGhHiIjJkKlLm', 'LIGHT', 200, 'USER'),
+--     ('bob',   'bob@example.com',   '$2a$10$7QJ8Z1e2Kp3mN5oP6qR8SuXvYwZaAbBcCdDeEfFgGhHiIjJkKlLm', 'DARK',  50, 'USER'),
+--     ('admin', 'admin@example.com', '$2a$10$7QJ8Z1e2Kp3mN5oP6qR8SuXvYwZaAbBcCdDeEfFgGhHiIjJkKlLm', 'LIGHT', 500, 'ADMIN');
 
-INSERT INTO notification_preference (user_id, notify_on_death, notify_before_death, daily_reminder) VALUES
-    (1, TRUE,  TRUE,  TRUE),
-    (2, TRUE,  FALSE, FALSE),
-    (3, FALSE, FALSE, FALSE);
+-- INSERT INTO notification_preference (user_id, notify_on_death, notify_before_death, daily_reminder) VALUES
+--     (1, TRUE,  TRUE,  TRUE),
+--     (2, TRUE,  FALSE, FALSE),
+--     (3, FALSE, FALSE, FALSE);
 
-INSERT INTO aquarium (user_id, is_public, level, capacity, name) VALUES
-    (1, TRUE,  2, 10, 'Alice''s Aquarium'),
-    (2, FALSE, 1,  5, 'Bob''s Aquarium'),
-    (3, TRUE,  3, 15, 'Admin''s Aquarium');
+-- INSERT INTO aquarium (user_id, is_public, level, capacity, name) VALUES
+--     (1, TRUE,  2, 10, 'Alice''s Aquarium'),
+--     (2, FALSE, 1,  5, 'Bob''s Aquarium'),
+--     (3, TRUE,  3, 15, 'Admin''s Aquarium');
 
-INSERT INTO fish (aquarium_id, name, species, color, size, age, life_points, last_fed_at) VALUES
-    (1, 'Nemo',   'Clownfish', 'Orange', 2, 1, 100, NOW()),
-    (1, 'Dory',   'Tang',      'Blue',   3, 2,  80, NOW() - INTERVAL '1 hour'),
-    (2, 'Goldie', 'Goldfish',  'Gold',   1, 0, 100, NOW()),
-    (3, 'Sharky', 'Shark',     'Grey',   5, 3,  60, NOW() - INTERVAL '2 hours');
+-- INSERT INTO fish (aquarium_id, name, species, color, size, age, life_points, last_fed_at) VALUES
+--     (1, 'Nemo',   'Clownfish', 'Orange', 2, 1, 100, NOW()),
+--     (1, 'Dory',   'Tang',      'Blue',   3, 2,  80, NOW() - INTERVAL '1 hour'),
+--     (2, 'Goldie', 'Goldfish',  'Gold',   1, 0, 100, NOW()),
+--     (3, 'Sharky', 'Shark',     'Grey',   5, 3,  60, NOW() - INTERVAL '2 hours');
 
-INSERT INTO friendship (requester_id, addressee_id, status, since) VALUES
-    (1, 2, 'ACCEPTED', NOW()),
-    (1, 3, 'PENDING',  NOW());
+-- INSERT INTO friendship (requester_id, addressee_id, status, since) VALUES
+--     (1, 2, 'ACCEPTED', NOW()),
+--     (1, 3, 'PENDING',  NOW());
 
-INSERT INTO trade (initiator_id, receiver_id, status, price) VALUES
-    (1, 2, 'PENDING',  100),
-    (2, 1, 'ACCEPTED',  50);
+-- INSERT INTO trade (initiator_id, receiver_id, status, price) VALUES
+--     (1, 2, 'PENDING',  100),
+--     (2, 1, 'ACCEPTED',  50);
 
-INSERT INTO trade_fish (trade_id, fish_id) VALUES
-    (1, 2);
+-- INSERT INTO trade_fish (trade_id, fish_id) VALUES
+--     (1, 2);
 
-INSERT INTO daily_challenge (id, name, reward, description) VALUES
-    (1, 'Feed all fish',           20, 'Feed all the fish in your aquarium'),
-    (2, 'Visit a friend aquarium', 10, 'Visit a friend''s aquarium'),
-    (3, 'Feed all fish',           20, 'Feed all the fish in your aquarium'),
-    (4, 'Level up your aquarium',  30, 'Upgrade your aquarium to the next level');
+-- INSERT INTO daily_challenge (id, name, reward, description) VALUES
+--     (1, 'Feed all fish',           20, 'Feed all the fish in your aquarium'),
+--     (2, 'Visit a friend aquarium', 10, 'Visit a friend''s aquarium'),
+--     (3, 'Feed all fish',           20, 'Feed all the fish in your aquarium'),
+--     (4, 'Level up your aquarium',  30, 'Upgrade your aquarium to the next level');
 
-INSERT INTO daily_challenge_user (daily_challenge_id, user_id, completed, date) VALUES
-    (1, 1, TRUE,  CURRENT_DATE),
-    (2, 1, FALSE, CURRENT_DATE),
-    (3, 2, TRUE,  CURRENT_DATE),
-    (4, 2, FALSE, CURRENT_DATE);
+-- INSERT INTO daily_challenge_user (daily_challenge_id, user_id, completed, date) VALUES
+--     (1, 1, TRUE,  CURRENT_DATE),
+--     (2, 1, FALSE, CURRENT_DATE),
+--     (3, 2, TRUE,  CURRENT_DATE),
+--     (4, 2, FALSE, CURRENT_DATE);
 
-INSERT INTO food (name, price, nutrition_value) VALUES
-    ('Basic Pellets',  10, 10),
-    ('Premium Flakes', 25, 25),
-    ('Live Brine',     50, 50);
+-- INSERT INTO food (name, price, nutrition_value) VALUES
+--     ('Basic Pellets',  10, 10),
+--     ('Premium Flakes', 25, 25),
+--     ('Live Brine',     50, 50);
 
-INSERT INTO aquarium_upgrade (name, price, capacity_bonus, level_bonus) VALUES
-    ('Small Extension', 100, 5, 0),
-    ('Level Up Kit',    200, 0, 1),
-    ('Deluxe Bundle',   400, 5, 1);
+-- INSERT INTO aquarium_upgrade (name, price, capacity_bonus, level_bonus) VALUES
+--     ('Small Extension', 100, 5, 0),
+--     ('Level Up Kit',    200, 0, 1),
+--     ('Deluxe Bundle',   400, 5, 1);

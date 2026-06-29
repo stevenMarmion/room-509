@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -24,6 +25,7 @@ public class DailyChallengeUser {
     @MapsId("dailyChallengeId")
     @JoinColumn(name = "daily_challenge_id")
     @JsonBackReference
+    @ToString.Exclude
     private DailyChallenge dailyChallenge;
 
     @ManyToOne

@@ -307,3 +307,117 @@ curl -X POST http://localhost:8080/api/shop/upgrades \
 ```sh
 curl -X DELETE http://localhost:8080/api/shop/upgrades/1
 ```
+
+# Tests unitaires & jeu de données — Little Fish
+
+## 1. Jeu de données SQL (`V2__seed_data.sql`)
+
+### Où le placer
+
+```
+backend/src/main/resources/db/migration/V2__seed_data.sql
+```
+
+Flyway détecte automatiquement les fichiers nommés `V{n}__*.sql`
+et les exécute dans l'ordre au démarrage du backend.
+
+### Ce que le fichier insère
+
+| Table                    | Lignes | Détail                                                    |
+|--------------------------|--------|-----------------------------------------------------------|
+| `users`                  | 6      | 1 admin + 5 users (alice, bob, charlie, diana, eve)       |
+| `notification_preference`| 6      | Une préférence par user                                   |
+| `aquarium`               | 6      | Un aquarium par user (niveaux et capacités variés)        |
+| `food`                   | 5      | Catalogue boutique                                        |
+| `aquarium_upgrade`       | 5      | Catalogue boutique                                        |
+| `fish`                   | 22     | 8 templates boutique (aquarium_id NULL) + 14 dans des aquariums |
+| `friendship`             | 6      | alice↔bob ACCEPTED, alice↔charlie ACCEPTED, charlie→diana PENDING, bob→eve BLOCKED |
+| `daily_challenge`        | 8      | Catalogue de défis                                        |
+| `daily_challenge_user`   | 11     | Progression du jour pour chaque user                      |
+| `trade`                  | 3      | 1 PENDING, 1 ACCEPTED, 1 REJECTED                         |
+
+### Comptes de test
+
+| Pseudo    | Email                      | Mot de passe | Rôle  |
+|-----------|----------------------------|--------------|-------|
+| `admin`   | admin@littlefish.dev       | admin123     | ADMIN |
+| `alice`   | alice@littlefish.dev       | password123  | USER  |
+| `bob`     | bob@littlefish.dev         | password123  | USER  |
+| `charlie` | charlie@littlefish.dev     | password123  | USER  |
+| `diana`   | diana@littlefish.dev       | password123  | USER  |
+| `eve`     | eve@littlefish.dev         | password123  | USER  |
+
+> Note : les hashs BCrypt correspondent au mot de passe indiqué ci-dessus
+> (coût 10, générés avec `BCryptPasswordEncoder`).
+
+---
+
+## 2. Tests unitaires
+
+### Où placer les fichiers
+
+Tous les fichiers `.java` vont dans le dossier des tests du backend :
+
+```
+backend/src/test/java/com/littlefish/app/service/
+```
+
+Structure après ajout :
+
+```
+backend/src/test/java/com/littlefish/app/
+├── AppApplicationTests.java          (existant)
+└── service/
+    ├── UserServiceTest.java
+    ├── FishServiceTest.java
+    ├── AquariumServiceTest.java
+    ├── ShopServiceTest.java
+    ├── TradeServiceTest.java
+    ├── FriendshipServiceTest.java
+    ├── JwtAndScheduledServiceTest.java
+    └── DailyAndNotificationServiceTest.java
+```
+
+### Lancer les tests
+
+```bash
+cd backend
+mvn test
+```
+
+Ou pour un seul fichier :
+
+```bash
+mvn test -Dtest=UserServiceTest
+```
+
+### Ce qui est testé
+
+| Fichier de test                    | Service(s) couverts                     | Cas testés |
+|------------------------------------|-----------------------------------------|------------|
+| `UserServiceTest`                  | UserService                             | 12         |
+| `FishServiceTest`                  | FishService                             | 9          |
+| `AquariumServiceTest`              | AquariumService                         | 10         |
+| `ShopServiceTest`                  | ShopService                             | 11         |
+| `TradeServiceTest`                 | TradeService                            | 9          |
+| `FriendshipServiceTest`            | FriendshipService                       | 10         |
+| `JwtAndScheduledServiceTest`       | JwtService + ScheduledTaskService       | 12         |
+| `DailyAndNotificationServiceTest`  | DailyChallengeService + NotifPrefService| 11         |
+| **Total**                          |                                         | **~84**    |
+
+### Dépendances de test utilisées
+
+Toutes incluses dans `spring-boot-starter-test` (déjà dans le `pom.xml`) :
+- **JUnit 5** (`@Test`, `@Nested`, `@DisplayName`)
+- **Mockito** (`@Mock`, `@InjectMocks`, `when/verify`)
+- **AssertJ** (`assertThat(...)`)
+
+Aucune dépendance supplémentaire à ajouter.
+
+### Points de vigilance
+
+- Les tests utilisent `@ExtendWith(MockitoExtension.class)` — pas de Spring context,
+  donc très rapides (< 1 sec total).
+- `JwtService` est testé sans mock car il n'a aucune dépendance externe.
+- Si les records DTOs (`FishCreateDTO`, `FishUpdateDTO`, etc.) changent de signature,
+  les constructeurs dans les tests devront être mis à jour en conséquence.

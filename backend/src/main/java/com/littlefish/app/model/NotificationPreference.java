@@ -3,6 +3,7 @@ package com.littlefish.app.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -20,7 +21,8 @@ public class NotificationPreference {
     private boolean dailyReminder;
 
     @JsonIgnore
-    @OneToOne
+    @ToString.Exclude
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 }
