@@ -13,6 +13,7 @@ Deadline to produce website is 30th June 2026
 ## Idea
 
 Manage your little fish is a game web application used to manage little fishs. 
+
 Every day, your fish will need to be feed, you will need to collect coins in order to buy food for fish and you can collect coins by clicking on your fish or completing daily tasks. 
 Fishs are losing point of life every minutes so you had to often check lifecycle of your aquarium in order to keep fishs alives.
 
