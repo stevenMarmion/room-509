@@ -34,7 +34,7 @@ const currentYear = new Date().getFullYear()
 <style scoped>
 .footer {
   /* margin-top: 300px; */
-  background: #0d7377;
+  background: var(--c-brand);
   color: rgba(255, 255, 255, 0.75);
 }
 

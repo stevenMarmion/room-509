@@ -106,11 +106,11 @@ onMounted(search)
 /* ── Header ── */
 .page-header h1 {
   font-size: 1.4rem;
-  color: #1a3a4a;
+  color: var(--c-heading);
   font-weight: 700;
   margin-bottom: 0.2rem;
 }
-.page-subtitle { font-size: 0.85rem; color: #aaa; }
+.page-subtitle { font-size: 0.85rem; color: var(--c-text-muted); }
 
 /* ── Results ── */
 .results-list {
@@ -120,7 +120,7 @@ onMounted(search)
 }
 
 .result-card {
-  background: #fff;
+  background: var(--c-card);
   border: none;
   border-radius: 14px;
   padding: 1rem 1.3rem;
@@ -141,7 +141,7 @@ onMounted(search)
 .result-avatar {
   width: 44px; height: 44px;
   border-radius: 50%;
-  background: #0d7377;
+  background: var(--c-brand);
   color: #fff;
   font-size: 1.1rem;
   font-weight: 700;
@@ -155,16 +155,16 @@ onMounted(search)
   flex-direction: column;
   gap: 0.15rem;
 }
-.result-pseudo { font-size: 0.95rem; color: #1a3a4a; }
+.result-pseudo { font-size: 0.95rem; color: var(--c-text); }
 .result-role {
   font-size: 0.76rem;
-  color: #888;
+  color: var(--c-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .result-chevron {
-  color: #ccc;
+  color: var(--c-border);
   flex-shrink: 0;
 }
 
@@ -175,9 +175,9 @@ onMounted(search)
   align-items: center;
   gap: 1rem;
   padding: 3rem 1rem;
-  color: #aaa;
+  color: var(--c-text-muted);
   font-size: 0.9rem;
-  background: #fff;
+  background: var(--c-card);
   border-radius: 14px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
 }
@@ -185,8 +185,8 @@ onMounted(search)
 
 .spinner {
   width: 32px; height: 32px;
-  border: 3px solid #e8f0f0;
-  border-top-color: #0d7377;
+  border: 3px solid var(--c-track);
+  border-top-color: var(--c-brand);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -199,8 +199,8 @@ onMounted(search)
   font-size: 0.88rem;
   cursor: pointer;
   font-weight: 600;
-  background: #f0f4f8;
-  color: #555;
+  background: var(--c-ghost-bg);
+  color: var(--c-ghost-text);
   transition: opacity 0.2s;
 }
 .btn-ghost:hover { opacity: 0.8; }

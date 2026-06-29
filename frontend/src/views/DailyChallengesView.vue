@@ -159,20 +159,20 @@ onMounted(loadChallenges)
 }
 .challenges-header h1 {
   font-size: 1.4rem;
-  color: #1a3a4a;
+  color: var(--c-heading);
   font-weight: 700;
   margin-bottom: 0.2rem;
 }
 .challenges-date {
   font-size: 0.82rem;
-  color: #aaa;
+  color: var(--c-text-muted);
 }
 
 .challenges-summary {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
-  background: #fff;
+  background: var(--c-card);
   border-radius: 12px;
   padding: 0.6rem 1.2rem;
   box-shadow: 0 1px 4px rgba(0,0,0,0.07);
@@ -180,11 +180,11 @@ onMounted(loadChallenges)
 .summary-count {
   font-size: 1.3rem;
   font-weight: 700;
-  color: #0d7377;
+  color: var(--c-brand);
 }
 .summary-label {
   font-size: 0.82rem;
-  color: #aaa;
+  color: var(--c-text-muted);
 }
 .summary-coins {
   font-size: 0.85rem;
@@ -196,13 +196,13 @@ onMounted(loadChallenges)
 /* ── Progress bar ── */
 .progress-track {
   height: 6px;
-  background: #e8f0f0;
+  background: var(--c-track);
   border-radius: 999px;
   overflow: hidden;
 }
 .progress-fill {
   height: 100%;
-  background: #0d7377;
+  background: var(--c-brand);
   border-radius: 999px;
   transition: width 0.5s ease;
 }
@@ -215,7 +215,7 @@ onMounted(loadChallenges)
 }
 
 .challenge-card {
-  background: #fff;
+  background: var(--c-card);
   border-radius: 14px;
   padding: 1.1rem 1.3rem;
   display: flex;
@@ -231,14 +231,14 @@ onMounted(loadChallenges)
 .challenge-check {
   width: 36px; height: 36px;
   border-radius: 50%;
-  border: 2px solid #dde3ea;
+  border: 2px solid var(--c-border);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
   transition: background 0.2s, border-color 0.2s;
 }
 .challenge-check--done {
-  background: #0d7377;
-  border-color: #0d7377;
+  background: var(--c-brand);
+  border-color: var(--c-brand);
 }
 
 /* Content */
@@ -250,15 +250,15 @@ onMounted(loadChallenges)
 }
 .challenge-name {
   font-size: 0.95rem;
-  color: #1a3a4a;
+  color: var(--c-text);
 }
 .challenge-date {
   font-size: 0.78rem;
-  color: #aaa;
+  color: var(--c-text-muted);
 }
 .challenge-description {
   font-size: 0.82rem;
-  color: #555;
+  color: var(--c-ghost-text);
   margin-top: 0.2rem;
 }
 
@@ -276,8 +276,8 @@ onMounted(loadChallenges)
   flex-shrink: 0;
 }
 .challenge-reward--done {
-  color: #aaa;
-  background: #f5f5f5;
+  color: var(--c-text-muted);
+  background: var(--c-row-alt);
 }
 
 /* ── States ── */
@@ -287,15 +287,15 @@ onMounted(loadChallenges)
   align-items: center;
   gap: 1rem;
   padding: 3rem 1rem;
-  color: #aaa;
+  color: var(--c-text-muted);
   font-size: 0.9rem;
 }
 .state-box--error { color: #e74c3c; }
 
 .spinner {
   width: 32px; height: 32px;
-  border: 3px solid #e8f0f0;
-  border-top-color: #0d7377;
+  border: 3px solid var(--c-track);
+  border-top-color: var(--c-brand);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -309,8 +309,8 @@ onMounted(loadChallenges)
   font-size: 0.9rem;
   cursor: pointer;
   font-weight: 600;
-  background: #f0f4f8;
-  color: #555;
+  background: var(--c-ghost-bg);
+  color: var(--c-ghost-text);
   transition: opacity 0.2s;
 }
 .btn-ghost:hover { opacity: 0.8; }

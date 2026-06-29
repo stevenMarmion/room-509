@@ -361,15 +361,15 @@ function resetFilters() {
 
 // ── Load fish ─────────────────────────────────────────────────────────────────
 
-async function loadFishes() {
-  loading.value = true
-  error.value   = null
+async function loadFishes({ silent = false } = {}) {
+  if (!silent) loading.value = true
+  error.value = null
   try {
     fishes.value = await get_api(`/api/users/${authStore.pseudo}/fishes`)
   } catch {
-    error.value = 'Could not load your fish. Please try again.'
+    if (!silent) error.value = 'Could not load your fish. Please try again.'
   } finally {
-    loading.value = false
+    if (!silent) loading.value = false
   }
 }
 
@@ -463,14 +463,18 @@ async function submitTrade() {
 
 // ── Lifecycle ─────────────────────────────────────────────────────────────────
 
+let hpPollInterval = null
+
 onMounted(async () => {
   await loadFishes()
   await measureAquarium()
   window.addEventListener('resize', measureAquarium)
+  hpPollInterval = setInterval(() => loadFishes({ silent: true }), 10_000)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', measureAquarium)
+  clearInterval(hpPollInterval)
 })
 </script>
 
@@ -493,15 +497,15 @@ onUnmounted(() => {
 }
 .page-header h1 {
   font-size: 1.4rem;
-  color: #1a3a4a;
+  color: var(--c-heading);
   font-weight: 700;
   margin-bottom: 0.2rem;
 }
-.page-subtitle { font-size: 0.82rem; color: #aaa; }
+.page-subtitle { font-size: 0.82rem; color: var(--c-text-muted); }
 
 /* ── Filters ── */
 .filters-card {
-  background: #fff;
+  background: var(--c-card);
   border-radius: 14px;
   padding: 1.2rem 1.5rem;
   box-shadow: 0 1px 4px rgba(0,0,0,0.07);
@@ -520,7 +524,7 @@ onUnmounted(() => {
 
 .filter-group label {
   font-size: 0.78rem;
-  color: #666;
+  color: var(--c-text-secondary);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -529,21 +533,21 @@ onUnmounted(() => {
 input[type="text"],
 input[type="number"],
 select {
-  border: 1.5px solid #dde3ea;
+  border: 1.5px solid var(--c-border);
   border-radius: 8px;
   padding: 0.5rem 0.75rem;
   font-size: 0.88rem;
-  color: #1a3a4a;
+  color: var(--c-text);
   outline: none;
-  background: #fafbfc;
+  background: var(--c-input-bg);
   transition: border-color 0.2s;
   width: 100%;
 }
-input:focus, select:focus { border-color: #0d7377; background: #fff; }
+input:focus, select:focus { border-color: var(--c-brand); background: var(--c-card); }
 
 /* ── Table ── */
 .table-wrapper {
-  background: #fff;
+  background: var(--c-card);
   border-radius: 14px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.07);
   overflow-x: auto;
@@ -556,7 +560,7 @@ table {
 }
 
 thead tr {
-  border-bottom: 2px solid #f0f4f8;
+  border-bottom: 2px solid var(--c-divider);
 }
 
 th {
@@ -566,12 +570,12 @@ th {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #0d7377;
+  color: var(--c-brand);
   white-space: nowrap;
   user-select: none;
 }
 th.sortable { cursor: pointer; }
-th.sortable:hover { color: #0a5c60; }
+th.sortable:hover { color: var(--c-brand-dark); }
 
 .sort-icon {
   display: inline-flex;
@@ -584,15 +588,15 @@ th.sortable:hover { color: #0a5c60; }
 }
 
 tbody tr {
-  border-bottom: 1px solid #f5f7fa;
+  border-bottom: 1px solid var(--c-row-alt);
   transition: background 0.15s;
 }
 tbody tr:last-child { border-bottom: none; }
-tbody tr:hover { background: #f8fbfb; }
+tbody tr:hover { background: var(--c-row-hover); }
 
 td {
   padding: 0.85rem 1.2rem;
-  color: #1a3a4a;
+  color: var(--c-text);
   vertical-align: middle;
 }
 
@@ -629,7 +633,7 @@ td {
 }
 
 .td-name { font-weight: 600; }
-.td-date { font-size: 0.82rem; color: #aaa; white-space: nowrap; }
+.td-date { font-size: 0.82rem; color: var(--c-text-muted); white-space: nowrap; }
 
 /* ── Actions ── */
 .td-actions {
@@ -639,10 +643,10 @@ td {
 
 .icon-btn {
   width: 30px; height: 30px;
-  border: 1.5px solid #dde3ea;
+  border: 1.5px solid var(--c-border);
   border-radius: 8px;
-  background: #fff;
-  color: #555;
+  background: var(--c-card);
+  color: var(--c-ghost-text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -650,9 +654,9 @@ td {
   transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 .icon-btn:hover {
-  border-color: #0d7377;
-  color: #0d7377;
-  background: #f8fbfb;
+  border-color: var(--c-brand);
+  color: var(--c-brand);
+  background: var(--c-row-hover);
 }
 
 /* ── Color badge ── */
@@ -661,7 +665,7 @@ td {
   border-radius: 999px;
   padding: 0.2rem 0.75rem;
   font-size: 0.8rem;
-  color: #1a3a4a;
+  color: var(--c-text);
   font-weight: 500;
 }
 
@@ -681,7 +685,7 @@ td {
 }
 .lp-label {
   font-size: 0.82rem;
-  color: #555;
+  color: var(--c-ghost-text);
   min-width: 24px;
 }
 
@@ -692,9 +696,9 @@ td {
   align-items: center;
   gap: 1rem;
   padding: 3rem 1rem;
-  color: #aaa;
+  color: var(--c-text-muted);
   font-size: 0.9rem;
-  background: #fff;
+  background: var(--c-card);
   border-radius: 14px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.07);
 }
@@ -702,8 +706,8 @@ td {
 
 .spinner {
   width: 32px; height: 32px;
-  border: 3px solid #e8f0f0;
-  border-top-color: #0d7377;
+  border: 3px solid var(--c-track);
+  border-top-color: var(--c-brand);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -717,8 +721,8 @@ td {
   font-size: 0.88rem;
   cursor: pointer;
   font-weight: 600;
-  background: #f0f4f8;
-  color: #555;
+  background: var(--c-ghost-bg);
+  color: var(--c-ghost-text);
   transition: opacity 0.2s;
 }
 .btn-ghost:hover:not(:disabled) { opacity: 0.8; }
@@ -731,7 +735,7 @@ td {
   font-size: 0.88rem;
   cursor: pointer;
   font-weight: 600;
-  background: #0d7377;
+  background: var(--c-brand);
   color: #fff;
   transition: opacity 0.2s;
 }
@@ -753,7 +757,7 @@ td {
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   white-space: nowrap;
 }
-.toast-notif--success { background: #0d7377; }
+.toast-notif--success { background: var(--c-brand); }
 .toast-notif--error   { background: #e74c3c; }
 
 .toast-enter-active, .toast-leave-active { transition: opacity 0.3s, transform 0.3s; }
@@ -772,7 +776,7 @@ td {
 }
 
 .modal-box {
-  background: #fff;
+  background: var(--c-card);
   border-radius: 16px;
   padding: 1.8rem;
   width: 100%;
@@ -782,7 +786,7 @@ td {
 
 .modal-box h3 {
   font-size: 1.05rem;
-  color: #1a3a4a;
+  color: var(--c-heading);
   margin-bottom: 1.2rem;
 }
 
@@ -793,7 +797,7 @@ td {
 }
 .form-group label {
   font-size: 0.82rem;
-  color: #666;
+  color: var(--c-text-secondary);
   font-weight: 500;
 }
 .form-hint {
