@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
 @Table(name = "users")
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = {"aquarium", "dailyChallengeEntries"})
+@EqualsAndHashCode(exclude = {"aquarium", "dailyChallengeEntries", "avatar", "friendships", "trades"})
 public class User {
 
     @Id
@@ -30,11 +31,9 @@ public class User {
     private int coins;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "role_enum")
     private Role role;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "theme_enum")
     private Theme theme;
 
     private LocalDateTime createdAt;
@@ -53,5 +52,6 @@ public class User {
     
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
+    @ToString.Exclude
     private List<DailyChallengeUser> dailyChallengeEntries;
 }
