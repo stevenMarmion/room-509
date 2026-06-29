@@ -47,53 +47,59 @@ TO DO (indicate diagram designed through md link to ./doc/uml folder)
 
 ## Commands
 
-### BACKEND
+### Build and run with Docker
 
-Go to backend folder :
+The `backend` and `frontend` Dockerfiles are multi-stage : each image builds itself
+from source (Maven for the backend, npm/Vite for the frontend), so the produced
+images always reflect the latest version of your files — no manual build step needed
+beforehand.
 
-```sh
-cd backend
-```
-
-And execute :
-
-```sh
-mvn clean package -DskipTests
-```
-
-To launch application, go to parent folder : 
-
-```sh
-cd ..
-```
-
-And execute :
+From the project root :
 
 ```sh
 docker compose up --build -d
 ```
 
-### FRONTEND
+This builds (or rebuilds) the `db`, `backend` and `frontend` images and starts the
+three containers :
 
-### Project Setup
+- `db` — PostgreSQL on `localhost:5432`
+- `backend` — Spring Boot API on `localhost:8080`
+- `frontend` — Vue.js app served on `localhost:5173`
+
+To rebuild only one service, e.g. after editing frontend code :
+
+```sh
+docker compose up --build -d frontend
+```
+
+To stop the stack :
+
+```sh
+docker compose down
+```
+
+### FRONTEND (local development, without Docker)
+
+#### Project Setup
 
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+#### Compile and Hot-Reload for Development
 
 ```sh
 npm run dev
 ```
 
-### Compile and Minify for Production
+#### Compile and Minify for Production
 
 ```sh
 npm run build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+#### Lint with [ESLint](https://eslint.org/)
 
 ```sh
 npm run lint
