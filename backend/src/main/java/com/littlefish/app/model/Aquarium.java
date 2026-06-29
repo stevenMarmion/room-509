@@ -26,7 +26,7 @@ public class Aquarium {
     private int capacity;
 
     @JsonIgnore
-    @ToString.Exclude
+    // @ToString.Exclude
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;

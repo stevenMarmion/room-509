@@ -27,13 +27,13 @@ public class Trade {
     private int price;
 
     @JsonIgnore
-    @ToString.Exclude
+    // @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "initiator_id")
     private User initiator;
 
     @JsonIgnore
-    @ToString.Exclude
+    // @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "receiver_id")
     private User receiver;

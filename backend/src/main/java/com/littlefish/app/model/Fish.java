@@ -29,13 +29,13 @@ public class Fish {
     private LocalDateTime lastFedAt;
 
     @JsonIgnore
-    @ToString.Exclude
+    // @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "aquarium_id")
     private Aquarium aquarium;
 
     @JsonIgnore
-    @ToString.Exclude
+    // @ToString.Exclude
     @ManyToMany(mappedBy = "fish")
     private List<Trade> trades;
 }

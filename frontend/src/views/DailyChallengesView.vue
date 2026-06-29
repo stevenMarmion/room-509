@@ -9,7 +9,7 @@
       <div class="challenges-summary">
         <span class="summary-count">{{ completedCount }}/{{ entries.length }}</span>
         <span class="summary-label">completed</span>
-        <span class="summary-coins">+{{ earnedCoins }} coins</span>
+        <span class="summary-coins" v-if="earnedCoins > 0">+{{ earnedCoins }} coins</span>
       </div>
     </div>
 
@@ -34,7 +34,7 @@
     <div v-else class="challenges-grid">
       <div
         v-for="entry in entries"
-        :key="entry.dailyChallenge.id"
+        :key="entry.id.dailyChallengeId"
         class="challenge-card"
         :class="{ 'challenge-card--done': entry.completed }"
         @click="completeChallenge(entry)"
@@ -47,13 +47,23 @@
         </div>
 
         <div class="challenge-content">
-          <strong class="challenge-name">{{ entry.dailyChallenge.name }}</strong>
-          <span class="challenge-description">{{ entry.dailyChallenge.description }}</span>
+          <strong class="challenge-name">
+            {{ entry.dailyChallenge?.name ?? `Challenge #${entry.id.dailyChallengeId}` }}
+          </strong>
+          <span class="challenge-description" v-if="entry.dailyChallenge?.description">
+            {{ entry.dailyChallenge.description }}
+          </span>
           <span class="challenge-date">{{ formatDate(entry.date) }}</span>
         </div>
 
-        <div class="challenge-reward" :class="{ 'challenge-reward--done': entry.completed }">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+        <div
+          v-if="entry.dailyChallenge?.reward"
+          class="challenge-reward"
+          :class="{ 'challenge-reward--done': entry.completed }"
+        >
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+            <circle cx="12" cy="12" r="10"/>
+          </svg>
           +{{ entry.dailyChallenge.reward }}
         </div>
       </div>
@@ -69,18 +79,18 @@ import { useAuthStore } from '@/stores/auth.js'
 
 const authStore = useAuthStore()
 
-// ── State ─────────────────────────────────────────────────────────────────────
-
-const entries = ref([])   // List<DailyChallengeUser>
+// ── State ──────────────────────────────────────────────────────────────────────
+const entries = ref([])
 const loading = ref(true)
 const error   = ref(null)
 
-// ── Computed ──────────────────────────────────────────────────────────────────
-
+// ── Computed ───────────────────────────────────────────────────────────────────
 const completedCount = computed(() => entries.value.filter(e => e.completed).length)
 
 const earnedCoins = computed(() =>
-  entries.value.filter(e => e.completed).reduce((sum, e) => sum + e.dailyChallenge.reward, 0)
+  entries.value
+    .filter(e => e.completed && e.dailyChallenge?.reward)
+    .reduce((sum, e) => sum + e.dailyChallenge.reward, 0)
 )
 
 const progressPercent = computed(() =>
@@ -88,24 +98,25 @@ const progressPercent = computed(() =>
 )
 
 const todayLabel = computed(() =>
-  new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  new Date().toLocaleDateString('en-US', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  })
 )
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
+// ── Helpers ────────────────────────────────────────────────────────────────────
 function formatDate(dateStr) {
   if (!dateStr) return ''
   return new Date(dateStr).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })
 }
 
-// ── Load ──────────────────────────────────────────────────────────────────────
-
+// ── Load ───────────────────────────────────────────────────────────────────────
 async function loadChallenges() {
   loading.value = true
   error.value   = null
   try {
-    // Récupère les entrées DailyChallengeUser de l'utilisateur connecté
-    const user = await get_api(`/api/users/${authStore.pseudo}`)
+    // user est déjà chargé par fetchCurrentUser() au démarrage de l'app,
+    // sinon on le récupère via le pseudo (comme avant)
+    const user = authStore.user ?? await get_api(`/api/users/${authStore.pseudo}`)
     entries.value = await get_api(`/api/challenges/user/${user.id}`)
   } catch {
     error.value = 'Could not load challenges. Please try again.'
@@ -114,18 +125,15 @@ async function loadChallenges() {
   }
 }
 
-// ── Complete ──────────────────────────────────────────────────────────────────
-
+// ── Complete ───────────────────────────────────────────────────────────────────
 async function completeChallenge(entry) {
   if (entry.completed) return
+  const challengeId = entry.id.dailyChallengeId
+  const userId      = entry.id.userId
   try {
-    const user = await get_api(`/api/users/${authStore.pseudo}`)
-    const updated = await post_api(
-      `/api/challenges/${entry.dailyChallenge.id}/complete/${user.id}`, {}
-    )
-    // Mettre à jour localement sans recharger
+    const updated = await post_api(`/api/challenges/${challengeId}/complete/${userId}`, {})
     const idx = entries.value.findIndex(
-      e => e.dailyChallenge.id === entry.dailyChallenge.id
+      e => e.id.dailyChallengeId === challengeId && e.id.userId === userId
     )
     if (idx !== -1) entries.value[idx] = updated
   } catch {
@@ -133,13 +141,11 @@ async function completeChallenge(entry) {
   }
 }
 
-// ── Lifecycle ─────────────────────────────────────────────────────────────────
-
+// ── Lifecycle ──────────────────────────────────────────────────────────────────
 onMounted(loadChallenges)
 </script>
 
 <style scoped>
-/* ── Layout ── */
 .challenges-layout {
   max-width: 680px;
   margin: 2rem auto;
@@ -149,7 +155,6 @@ onMounted(loadChallenges)
   gap: 1.2rem;
 }
 
-/* ── Header ── */
 .challenges-header {
   display: flex;
   align-items: center;
@@ -193,7 +198,6 @@ onMounted(loadChallenges)
   margin-left: 0.4rem;
 }
 
-/* ── Progress bar ── */
 .progress-track {
   height: 6px;
   background: var(--c-track);
@@ -207,7 +211,6 @@ onMounted(loadChallenges)
   transition: width 0.5s ease;
 }
 
-/* ── Challenge cards ── */
 .challenges-grid {
   display: flex;
   flex-direction: column;
@@ -227,7 +230,6 @@ onMounted(loadChallenges)
 .challenge-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 .challenge-card--done { opacity: 0.65; }
 
-/* Checkmark circle */
 .challenge-check {
   width: 36px; height: 36px;
   border-radius: 50%;
@@ -241,7 +243,6 @@ onMounted(loadChallenges)
   border-color: var(--c-brand);
 }
 
-/* Content */
 .challenge-content {
   flex: 1;
   display: flex;
@@ -262,7 +263,6 @@ onMounted(loadChallenges)
   margin-top: 0.2rem;
 }
 
-/* Reward badge */
 .challenge-reward {
   display: flex;
   align-items: center;
@@ -280,7 +280,6 @@ onMounted(loadChallenges)
   background: var(--c-row-alt);
 }
 
-/* ── States ── */
 .state-box {
   display: flex;
   flex-direction: column;
@@ -301,7 +300,6 @@ onMounted(loadChallenges)
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── Buttons ── */
 .btn-ghost {
   border: none;
   border-radius: 8px;
@@ -315,7 +313,6 @@ onMounted(loadChallenges)
 }
 .btn-ghost:hover { opacity: 0.8; }
 
-/* ── Responsive ── */
 @media (max-width: 480px) {
   .challenges-header { flex-direction: column; align-items: flex-start; }
 }

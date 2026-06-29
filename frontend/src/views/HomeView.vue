@@ -24,7 +24,7 @@
     <!-- ── Sidebar ── -->
     <aside class="sidebar">
 
-      <RouterLink to="/daily-challenges" class="side-card">
+      <!-- <RouterLink to="/daily-challenges" class="side-card">
         <span class="side-icon" style="background:#0d7377;">
           <svg viewBox="0 0 24 24" fill="#fff" width="20" height="20">
             <path d="M21 6H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1zm-1 10H4V8h16v8zm-8-6H8v2h4v-2zm4 0h-2v2h2v-2z"/>
@@ -34,7 +34,7 @@
           <strong>Daily challenges</strong>
           <span>{{ challengesSummary }}</span>
         </div>
-      </RouterLink>
+      </RouterLink> -->
 
       <RouterLink to="/shop" class="side-card">
         <span class="side-icon" style="background:#14a085;">

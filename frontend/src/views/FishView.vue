@@ -394,7 +394,17 @@ async function saveFishName() {
 
   savingName.value = true
   try {
-    await put_api(`/api/fish/${editingFish.value.id}`, newName)
+    await put_api(`/api/fish/${editingFish.value.id}`, { 
+      name: newName,
+      species:    null,
+      color:      null,
+      price:      0,
+      size:       0,
+      age:        0,
+      lifePoints: 0,
+      lastFedAt:  null,
+      aquariumId: null, 
+    })
     editingFish.value.name = newName
     showToast('Fish renamed successfully.', 'success')
     closeEditPopup()
