@@ -64,11 +64,11 @@ async function handleLogin() {
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
-  background: #f0f4f8;
+  background: var(--c-page-bg);
 }
 
 .auth-card {
-  background: #fff;
+  background: var(--c-card);
   border-radius: 16px;
   padding: 2.5rem;
   width: 100%;
@@ -78,13 +78,13 @@ async function handleLogin() {
 
 .auth-card h1 {
   font-size: 1.4rem;
-  color: #1a3a4a;
+  color: var(--c-heading);
   margin-bottom: 0.3rem;
 }
 
 .auth-subtitle {
   font-size: 0.88rem;
-  color: #aaa;
+  color: var(--c-text-muted);
   margin-bottom: 1.8rem;
 }
 
@@ -97,24 +97,24 @@ async function handleLogin() {
 
 label {
   font-size: 0.82rem;
-  color: #666;
+  color: var(--c-text-secondary);
   font-weight: 500;
 }
 
 input[type="text"],
 input[type="password"],
 input[type="email"] {
-  border: 1.5px solid #dde3ea;
+  border: 1.5px solid var(--c-border);
   border-radius: 8px;
   padding: 0.6rem 0.85rem;
   font-size: 0.92rem;
-  color: #1a3a4a;
+  color: var(--c-text);
   outline: none;
-  background: #fafbfc;
+  background: var(--c-input-bg);
   transition: border-color 0.2s;
   width: 100%;
 }
-input:focus { border-color: #0d7377; background: #fff; }
+input:focus { border-color: var(--c-brand); background: var(--c-card); }
 
 .auth-error {
   color: #e74c3c;
@@ -130,7 +130,7 @@ input:focus { border-color: #0d7377; background: #fff; }
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  background: #0d7377;
+  background: var(--c-brand);
   color: #fff;
   transition: opacity 0.2s;
   margin-top: 0.5rem;
@@ -141,11 +141,11 @@ input:focus { border-color: #0d7377; background: #fff; }
 .auth-switch {
   text-align: center;
   font-size: 0.85rem;
-  color: #888;
+  color: var(--c-text-muted);
   margin-top: 1.5rem;
 }
 .auth-switch a {
-  color: #0d7377;
+  color: var(--c-brand);
   font-weight: 600;
   text-decoration: none;
 }

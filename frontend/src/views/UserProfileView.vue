@@ -279,7 +279,7 @@ onMounted(loadAll)
 
 /* ── Card ── */
 .pcard {
-  background: #fff;
+  background: var(--c-card);
   border-radius: 14px;
   padding: 1.5rem;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
@@ -294,7 +294,7 @@ onMounted(loadAll)
 .avatar-circle {
   width: 80px; height: 80px;
   border-radius: 50%;
-  background: #0d7377;
+  background: var(--c-brand);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
   font-size: 2rem;
@@ -304,13 +304,13 @@ onMounted(loadAll)
 .profile-meta { flex: 1; }
 .profile-meta h2 {
   font-size: 1.25rem;
-  color: #1a3a4a;
+  color: var(--c-heading);
   margin-bottom: 0.2rem;
 }
 .role-badge {
   display: inline-block;
-  background: #e8f7f7;
-  color: #0d7377;
+  background: var(--c-brand-soft);
+  color: var(--c-brand);
   border-radius: 999px;
   padding: 0.15rem 0.75rem;
   font-size: 0.78rem;
@@ -318,7 +318,7 @@ onMounted(loadAll)
 }
 .joined {
   font-size: 0.8rem;
-  color: #aaa;
+  color: var(--c-text-muted);
   margin-top: 0.3rem;
 }
 
@@ -332,7 +332,7 @@ onMounted(loadAll)
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
-  background: #0d7377;
+  background: var(--c-brand);
   color: #fff;
   transition: opacity 0.2s;
 }
@@ -347,7 +347,7 @@ onMounted(loadAll)
   font-weight: 600;
 }
 .status-pill--pending  { background: #fff8ee; color: #f5a623; }
-.status-pill--accepted { background: #e8f7f7; color: #0d7377; }
+.status-pill--accepted { background: var(--c-brand-soft); color: var(--c-brand); }
 .status-pill--blocked  { background: #fde8e8; color: #e74c3c; }
 
 /* ── Section title ── */
@@ -356,7 +356,7 @@ onMounted(loadAll)
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #0d7377;
+  color: var(--c-brand);
   margin-bottom: 1rem;
 }
 
@@ -371,10 +371,10 @@ onMounted(loadAll)
 .aquarium-stat strong {
   display: block;
   font-size: 1.2rem;
-  color: #0d7377;
+  color: var(--c-brand);
   font-weight: 700;
 }
-.aquarium-stat span { font-size: 0.78rem; color: #888; }
+.aquarium-stat span { font-size: 0.78rem; color: var(--c-text-muted); }
 
 /* ── Private notice ── */
 .private-notice {
@@ -383,7 +383,7 @@ onMounted(loadAll)
   align-items: center;
   gap: 0.8rem;
   padding: 2.5rem 1rem;
-  color: #aaa;
+  color: var(--c-text-muted);
   font-size: 0.9rem;
 }
 
@@ -391,7 +391,7 @@ onMounted(loadAll)
 .table-wrapper {
   border-radius: 10px;
   overflow-x: auto;
-  border: 1px solid #f0f4f8;
+  border: 1px solid var(--c-divider);
 }
 
 table {
@@ -400,7 +400,7 @@ table {
   font-size: 0.88rem;
 }
 
-thead tr { border-bottom: 2px solid #f0f4f8; }
+thead tr { border-bottom: 2px solid var(--c-divider); }
 
 th {
   padding: 0.7rem 1rem;
@@ -409,16 +409,16 @@ th {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #0d7377;
+  color: var(--c-brand);
   white-space: nowrap;
 }
 
-tbody tr { border-bottom: 1px solid #f5f7fa; }
+tbody tr { border-bottom: 1px solid var(--c-row-alt); }
 tbody tr:last-child { border-bottom: none; }
 
 td {
   padding: 0.7rem 1rem;
-  color: #1a3a4a;
+  color: var(--c-text);
   vertical-align: middle;
 }
 .td-name { font-weight: 600; }
@@ -435,7 +435,7 @@ td {
   max-width: 60px;
   width: 60px;
 }
-.lp-label { font-size: 0.8rem; color: #555; }
+.lp-label { font-size: 0.8rem; color: var(--c-ghost-text); }
 
 /* ── States ── */
 .state-box {
@@ -444,9 +444,9 @@ td {
   align-items: center;
   gap: 1rem;
   padding: 3rem 1rem;
-  color: #aaa;
+  color: var(--c-text-muted);
   font-size: 0.9rem;
-  background: #fff;
+  background: var(--c-card);
   border-radius: 14px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
 }
@@ -459,8 +459,8 @@ td {
 
 .spinner {
   width: 28px; height: 28px;
-  border: 3px solid #e8f0f0;
-  border-top-color: #0d7377;
+  border: 3px solid var(--c-track);
+  border-top-color: var(--c-brand);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -473,8 +473,8 @@ td {
   font-size: 0.88rem;
   cursor: pointer;
   font-weight: 600;
-  background: #f0f4f8;
-  color: #555;
+  background: var(--c-ghost-bg);
+  color: var(--c-ghost-text);
   transition: opacity 0.2s;
 }
 .btn-ghost:hover { opacity: 0.8; }
@@ -494,7 +494,7 @@ td {
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   white-space: nowrap;
 }
-.toast-notif--success { background: #0d7377; }
+.toast-notif--success { background: var(--c-brand); }
 .toast-notif--error   { background: #e74c3c; }
 
 .toast-enter-active, .toast-leave-active { transition: opacity 0.3s, transform 0.3s; }

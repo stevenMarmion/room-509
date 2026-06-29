@@ -212,7 +212,7 @@ onMounted(loadAll)
 
 /* ── Card ── */
 .acard {
-  background: #fff;
+  background: var(--c-card);
   border-radius: 14px;
   padding: 1.5rem;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
@@ -228,12 +228,12 @@ onMounted(loadAll)
 }
 .aq-header h1 {
   font-size: 1.3rem;
-  color: #1a3a4a;
+  color: var(--c-heading);
   font-weight: 700;
 }
 .aq-subtitle {
   font-size: 0.82rem;
-  color: #aaa;
+  color: var(--c-text-muted);
   margin-top: 0.2rem;
 }
 
@@ -246,7 +246,7 @@ onMounted(loadAll)
 .visibility-label {
   font-size: 0.88rem;
   font-weight: 600;
-  color: #1a3a4a;
+  color: var(--c-text);
 }
 
 .toggle { position: relative; width: 52px; height: 28px; flex-shrink: 0; }
@@ -254,12 +254,12 @@ onMounted(loadAll)
 .toggle-track {
   position: absolute;
   inset: 0;
-  background: #dde3ea;
+  background: var(--c-border);
   border-radius: 999px;
   cursor: pointer;
   transition: background 0.3s;
 }
-.toggle input:checked + .toggle-track { background: #0d7377; }
+.toggle input:checked + .toggle-track { background: var(--c-brand); }
 .toggle input:disabled + .toggle-track { opacity: 0.6; cursor: not-allowed; }
 .toggle-track::after {
   content: '';
@@ -278,10 +278,10 @@ onMounted(loadAll)
   align-items: center;
   gap: 0.5rem;
   font-size: 0.82rem;
-  color: #888;
+  color: var(--c-text-muted);
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #f0f4f8;
+  border-top: 1px solid var(--c-divider);
 }
 
 /* ── Section title ── */
@@ -290,7 +290,7 @@ onMounted(loadAll)
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #0d7377;
+  color: var(--c-brand);
   margin-bottom: 1rem;
 }
 
@@ -305,20 +305,20 @@ onMounted(loadAll)
 .stat-item strong {
   display: block;
   font-size: 1.4rem;
-  color: #0d7377;
+  color: var(--c-brand);
   font-weight: 700;
 }
-.stat-item span { font-size: 0.8rem; color: #888; }
+.stat-item span { font-size: 0.8rem; color: var(--c-text-muted); }
 
 .capacity-track {
   height: 8px;
-  background: #e8f0f0;
+  background: var(--c-track);
   border-radius: 999px;
   overflow: hidden;
 }
 .capacity-fill {
   height: 100%;
-  background: #0d7377;
+  background: var(--c-brand);
   border-radius: 999px;
   transition: width 0.5s ease;
 }
@@ -335,7 +335,7 @@ onMounted(loadAll)
 
 .link-more {
   font-size: 0.84rem;
-  color: #0d7377;
+  color: var(--c-brand);
   text-decoration: none;
   font-weight: 600;
 }
@@ -356,22 +356,22 @@ onMounted(loadAll)
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  background: #f8fbfb;
+  background: var(--c-row-hover);
   border-radius: 10px;
   padding: 0.7rem 0.9rem;
   text-decoration: none;
   color: inherit;
   transition: background 0.2s;
 }
-.fish-chip:hover { background: #eef6f6; }
+.fish-chip:hover { background: var(--c-row-alt); }
 
 .fish-dot {
   width: 8px; height: 8px;
   border-radius: 50%;
   margin-bottom: 0.2rem;
 }
-.fish-name { font-size: 0.88rem; font-weight: 600; color: #1a3a4a; }
-.fish-species { font-size: 0.76rem; color: #aaa; }
+.fish-name { font-size: 0.88rem; font-weight: 600; color: var(--c-text); }
+.fish-species { font-size: 0.76rem; color: var(--c-text-muted); }
 
 /* ── States ── */
 .state-box {
@@ -380,9 +380,9 @@ onMounted(loadAll)
   align-items: center;
   gap: 1rem;
   padding: 3rem 1rem;
-  color: #aaa;
+  color: var(--c-text-muted);
   font-size: 0.9rem;
-  background: #fff;
+  background: var(--c-card);
   border-radius: 14px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
 }
@@ -395,8 +395,8 @@ onMounted(loadAll)
 
 .spinner {
   width: 32px; height: 32px;
-  border: 3px solid #e8f0f0;
-  border-top-color: #0d7377;
+  border: 3px solid var(--c-track);
+  border-top-color: var(--c-brand);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -409,8 +409,8 @@ onMounted(loadAll)
   font-size: 0.88rem;
   cursor: pointer;
   font-weight: 600;
-  background: #f0f4f8;
-  color: #555;
+  background: var(--c-ghost-bg);
+  color: var(--c-ghost-text);
   text-decoration: none;
   transition: opacity 0.2s;
   display: inline-block;
@@ -432,7 +432,7 @@ onMounted(loadAll)
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   white-space: nowrap;
 }
-.toast-notif--success { background: #0d7377; }
+.toast-notif--success { background: var(--c-brand); }
 .toast-notif--error   { background: #e74c3c; }
 
 .toast-enter-active, .toast-leave-active { transition: opacity 0.3s, transform 0.3s; }

@@ -63,7 +63,7 @@ const currentTitle = computed(() => {
 .admin-shell {
   display: flex;
   min-height: 100vh;
-  background: #f0f4f8;
+  background: var(--c-page-bg);
   font-family: 'Inter', system-ui, sans-serif;
 }
 
@@ -117,7 +117,7 @@ const currentTitle = computed(() => {
 .admin-nav__item--active {
   color: #fff;
   background: rgba(13,115,119,0.3);
-  border-left-color: #0d7377;
+  border-left-color: var(--c-brand);
 }
 
 .admin-nav__icon { display: flex; align-items: center; opacity: 0.8; }
@@ -144,8 +144,8 @@ const currentTitle = computed(() => {
 }
 
 .admin-topbar {
-  background: #fff;
-  border-bottom: 1px solid #e8edf2;
+  background: var(--c-card);
+  border-bottom: 1px solid var(--c-border);
   padding: 1rem 1.5rem;
   display: flex;
   align-items: center;
@@ -155,7 +155,7 @@ const currentTitle = computed(() => {
 .admin-topbar__title {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #1a3a4a;
+  color: var(--c-heading);
   margin: 0;
 }
 
@@ -163,7 +163,7 @@ const currentTitle = computed(() => {
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  background: #0d7377;
+  background: var(--c-brand);
   color: #fff;
   border-radius: 4px;
   padding: 0.2rem 0.5rem;

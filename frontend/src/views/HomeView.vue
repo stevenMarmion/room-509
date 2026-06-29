@@ -256,7 +256,7 @@ const tradeRequests     = ref('Loading...')
 }
 
 .side-card {
-  background: #fff;
+  background: var(--c-card);
   border-radius: 12px;
   padding: 1rem 1.2rem;
   display: flex;
@@ -285,11 +285,11 @@ const tradeRequests     = ref('Loading...')
 .side-text strong {
   display: block;
   font-size: 0.95rem;
-  color: #1a1a2e;
+  color: var(--c-heading);
 }
 .side-text span {
   font-size: 0.8rem;
-  color: #888;
+  color: var(--c-text-muted);
 }
 
 /* ══ Landing page (unauthenticated) ══ */
@@ -310,7 +310,7 @@ const tradeRequests     = ref('Loading...')
 
 .hero h1 {
   font-size: 2.1rem;
-  color: #1a3a4a;
+  color: var(--c-heading);
   font-weight: 800;
   margin-bottom: 0.8rem;
   line-height: 1.25;
@@ -318,7 +318,7 @@ const tradeRequests     = ref('Loading...')
 
 .hero-subtitle {
   font-size: 1.02rem;
-  color: #667;
+  color: var(--c-text-secondary);
   max-width: 560px;
   margin: 0 auto 1.8rem;
   line-height: 1.55;
@@ -342,17 +342,17 @@ const tradeRequests     = ref('Loading...')
 .btn-hero:hover { transform: translateY(-1px); }
 
 .btn-hero--solid {
-  background: #0d7377;
+  background: var(--c-brand);
   color: #fff;
 }
 .btn-hero--solid:hover { opacity: 0.9; }
 
 .btn-hero--ghost {
-  background: #fff;
-  color: #0d7377;
-  border: 1.5px solid #dde3ea;
+  background: var(--c-card);
+  color: var(--c-brand);
+  border: 1.5px solid var(--c-border);
 }
-.btn-hero--ghost:hover { border-color: #0d7377; }
+.btn-hero--ghost:hover { border-color: var(--c-brand); }
 
 /* ── Preview image ── */
 .hero-preview {
@@ -375,7 +375,7 @@ const tradeRequests     = ref('Loading...')
 }
 
 .feature-card {
-  background: #fff;
+  background: var(--c-card);
   border-radius: 14px;
   padding: 1.5rem;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
@@ -395,12 +395,12 @@ const tradeRequests     = ref('Loading...')
 
 .feature-card strong {
   font-size: 1rem;
-  color: #1a3a4a;
+  color: var(--c-heading);
 }
 
 .feature-card p {
   font-size: 0.85rem;
-  color: #888;
+  color: var(--c-text-muted);
   line-height: 1.5;
 }
 

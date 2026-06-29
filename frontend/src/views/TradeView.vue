@@ -307,15 +307,15 @@ onMounted(loadTrades)
 /* ── Header ── */
 .page-header h1 {
   font-size: 1.4rem;
-  color: #1a3a4a;
+  color: var(--c-heading);
   font-weight: 700;
   margin-bottom: 0.2rem;
 }
-.page-subtitle { font-size: 0.82rem; color: #aaa; }
+.page-subtitle { font-size: 0.82rem; color: var(--c-text-muted); }
 
 /* ── Filters ── */
 .filters-card {
-  background: #fff;
+  background: var(--c-card);
   border-radius: 14px;
   padding: 1.2rem 1.5rem;
   box-shadow: 0 1px 4px rgba(0,0,0,0.07);
@@ -334,7 +334,7 @@ onMounted(loadTrades)
 
 .filter-group label {
   font-size: 0.78rem;
-  color: #666;
+  color: var(--c-text-secondary);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -343,17 +343,17 @@ onMounted(loadTrades)
 input[type="text"],
 input[type="number"],
 select {
-  border: 1.5px solid #dde3ea;
+  border: 1.5px solid var(--c-border);
   border-radius: 8px;
   padding: 0.5rem 0.75rem;
   font-size: 0.88rem;
-  color: #1a3a4a;
+  color: var(--c-text);
   outline: none;
-  background: #fafbfc;
+  background: var(--c-input-bg);
   transition: border-color 0.2s;
   width: 100%;
 }
-input:focus, select:focus { border-color: #0d7377; background: #fff; }
+input:focus, select:focus { border-color: var(--c-brand); background: var(--c-card); }
 
 /* ── Trades list ── */
 .trades-list {
@@ -363,7 +363,7 @@ input:focus, select:focus { border-color: #0d7377; background: #fff; }
 }
 
 .trade-card {
-  background: #fff;
+  background: var(--c-card);
   border: none;
   border-radius: 14px;
   padding: 1rem 1.3rem;
@@ -384,7 +384,7 @@ input:focus, select:focus { border-color: #0d7377; background: #fff; }
 .trade-avatar {
   width: 44px; height: 44px;
   border-radius: 50%;
-  background: #0d7377;
+  background: var(--c-brand);
   color: #fff;
   font-size: 1.1rem;
   font-weight: 700;
@@ -400,10 +400,10 @@ input:focus, select:focus { border-color: #0d7377; background: #fff; }
   gap: 0.2rem;
   min-width: 0;
 }
-.trade-pseudo { font-size: 0.95rem; color: #1a3a4a; }
+.trade-pseudo { font-size: 0.95rem; color: var(--c-text); }
 .trade-fish-names {
   font-size: 0.78rem;
-  color: #aaa;
+  color: var(--c-text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -435,7 +435,7 @@ input:focus, select:focus { border-color: #0d7377; background: #fff; }
   font-weight: 600;
 }
 .badge--pending  { background: #fff8ee; color: #f5a623; }
-.badge--accepted { background: #e8f7f7; color: #0d7377; }
+.badge--accepted { background: var(--c-brand-soft); color: var(--c-brand); }
 .badge--rejected { background: #fde8e8; color: #e74c3c; }
 
 /* ── States ── */
@@ -445,9 +445,9 @@ input:focus, select:focus { border-color: #0d7377; background: #fff; }
   align-items: center;
   gap: 1rem;
   padding: 3rem 1rem;
-  color: #aaa;
+  color: var(--c-text-muted);
   font-size: 0.9rem;
-  background: #fff;
+  background: var(--c-card);
   border-radius: 14px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.07);
 }
@@ -455,8 +455,8 @@ input:focus, select:focus { border-color: #0d7377; background: #fff; }
 
 .spinner {
   width: 32px; height: 32px;
-  border: 3px solid #e8f0f0;
-  border-top-color: #0d7377;
+  border: 3px solid var(--c-track);
+  border-top-color: var(--c-brand);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -470,8 +470,8 @@ input:focus, select:focus { border-color: #0d7377; background: #fff; }
   font-size: 0.88rem;
   cursor: pointer;
   font-weight: 600;
-  background: #f0f4f8;
-  color: #555;
+  background: var(--c-ghost-bg);
+  color: var(--c-ghost-text);
   transition: opacity 0.2s;
 }
 .btn-ghost:hover:not(:disabled) { opacity: 0.8; }
@@ -484,7 +484,7 @@ input:focus, select:focus { border-color: #0d7377; background: #fff; }
   font-size: 0.88rem;
   cursor: pointer;
   font-weight: 600;
-  background: #0d7377;
+  background: var(--c-brand);
   color: #fff;
   transition: opacity 0.2s;
 }
@@ -506,7 +506,7 @@ input:focus, select:focus { border-color: #0d7377; background: #fff; }
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   white-space: nowrap;
 }
-.toast-notif--success { background: #0d7377; }
+.toast-notif--success { background: var(--c-brand); }
 .toast-notif--error   { background: #e74c3c; }
 
 .toast-enter-active, .toast-leave-active { transition: opacity 0.3s, transform 0.3s; }
@@ -525,7 +525,7 @@ input:focus, select:focus { border-color: #0d7377; background: #fff; }
 }
 
 .modal-box {
-  background: #fff;
+  background: var(--c-card);
   border-radius: 16px;
   padding: 1.8rem;
   width: 100%;
@@ -541,16 +541,16 @@ input:focus, select:focus { border-color: #0d7377; background: #fff; }
   border: none;
   background: none;
   font-size: 1rem;
-  color: #aaa;
+  color: var(--c-text-muted);
   cursor: pointer;
   line-height: 1;
   padding: 0.2rem;
 }
-.modal-close:hover { color: #555; }
+.modal-close:hover { color: var(--c-ghost-text); }
 
 .modal-box h3 {
   font-size: 1.05rem;
-  color: #1a3a4a;
+  color: var(--c-heading);
   margin-bottom: 1.2rem;
 }
 
@@ -563,11 +563,11 @@ input:focus, select:focus { border-color: #0d7377; background: #fff; }
 .trade-detail-header strong {
   display: block;
   font-size: 1rem;
-  color: #1a3a4a;
+  color: var(--c-text);
 }
 .trade-direction {
   font-size: 0.78rem;
-  color: #aaa;
+  color: var(--c-text-muted);
 }
 
 .trade-detail-rows {
@@ -575,8 +575,8 @@ input:focus, select:focus { border-color: #0d7377; background: #fff; }
   flex-direction: column;
   gap: 0.7rem;
   padding: 1rem 0;
-  border-top: 1px solid #f0f4f8;
-  border-bottom: 1px solid #f0f4f8;
+  border-top: 1px solid var(--c-divider);
+  border-bottom: 1px solid var(--c-divider);
 }
 
 .detail-row {
@@ -585,13 +585,13 @@ input:focus, select:focus { border-color: #0d7377; background: #fff; }
   justify-content: space-between;
   font-size: 0.88rem;
 }
-.detail-row span { color: #888; }
-.detail-row strong { color: #1a3a4a; text-align: right; }
+.detail-row span { color: var(--c-text-muted); }
+.detail-row strong { color: var(--c-text); text-align: right; }
 .price-highlight { color: #f5a623 !important; }
 
 .trade-hint {
   font-size: 0.82rem;
-  color: #aaa;
+  color: var(--c-text-muted);
   text-align: center;
   margin-top: 1.2rem;
 }

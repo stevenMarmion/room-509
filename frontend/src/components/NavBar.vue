@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0d7377;">
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-brand-bg">
     <div class="container-fluid px-4">
 
       <!-- Brand -->
@@ -105,6 +105,10 @@ function handleSearch() {
 </script>
 
 <style scoped>
+.navbar-brand-bg {
+  background-color: var(--c-brand) !important;
+}
+
 .coins-badge {
   background: #f5a623;
   color: #fff;
@@ -121,7 +125,7 @@ function handleSearch() {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #1a3a4a;
+  background: var(--c-heading);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -16,7 +16,18 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!pseudo.value)
 
+  const theme = ref(localStorage.getItem('theme') || 'LIGHT')
+
   // ── Actions ─────────────────────────────────────────────────────────────────
+
+  function setTheme(t) {
+    theme.value = t
+    localStorage.setItem('theme', t)
+    document.documentElement.setAttribute('data-theme', t === 'DARK' ? 'dark' : 'light')
+  }
+
+  // Apply saved theme immediately on store init (restores preference on page refresh)
+  setTheme(theme.value)
 
   async function login(loginPseudo, password) {
     const data = await post_api('/api/auth/login', { pseudo: loginPseudo, password })
@@ -50,6 +61,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const data = await get_api(`/api/users/${encodeURIComponent(pseudo.value)}`)
       user.value = data
+      setTheme(data.theme ?? 'LIGHT')
     } catch {
       clearSession()
     }
@@ -61,6 +73,7 @@ export const useAuthStore = defineStore('auth', () => {
     role.value = data.role
     sessionStorage.setItem('pseudo', data.pseudo)
     sessionStorage.setItem('role', data.role)
+    setTheme(data.theme ?? 'LIGHT')
   }
 
   function clearSession() {
@@ -69,6 +82,7 @@ export const useAuthStore = defineStore('auth', () => {
     role.value = null
     sessionStorage.removeItem('pseudo')
     sessionStorage.removeItem('role')
+    setTheme('LIGHT')
   }
 
   return {
@@ -80,6 +94,8 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     fetchCurrentUser,
     role,
-    isAdmin
+    isAdmin,
+    theme,
+    setTheme,
   }
 })
